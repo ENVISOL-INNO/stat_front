@@ -41,6 +41,7 @@ export default defineNuxtConfig({
   modules: ["vuetify-nuxt-module", '@sidebase/nuxt-auth', "@pinia/nuxt", "@nuxt/image", "nuxt-plotly"],
   auth: {
     isEnabled: true,
+    // isEnabled: false,
     // disableServerSideAuth: false,
     originEnvKey: 'NUXT_AUTH_ORIGIN',
     baseURL: process.env.NUXT_AUTH_ORIGIN + '/api/auth',   // this must be updated for production and be app url + path to NuxtAuthHandler ALSO this path must be added to the Allowed callback url on auth0 manager

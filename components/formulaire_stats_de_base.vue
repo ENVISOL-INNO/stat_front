@@ -69,7 +69,6 @@ async function post_stats_de_base() {
 };
 
 
-
 /**
  * Download contents as a file
  * Source: https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side

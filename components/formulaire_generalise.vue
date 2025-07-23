@@ -41,16 +41,14 @@
 
 <script lang="ts" setup>
 import { useMyData_and_resultsStore, useMySpectraStore, Resultat } from '~/stores/data_and_results';
-import type { ParameterMap } from '~/stores/data_and_results';
+import type { ParameterMap, Parameter } from '~/stores/data_and_results';
 import chiplist from './chiplist.vue';
 import Chiplist from './chiplist.vue';
 // import type { AllowedParameters, ParameterMap } from '~/stores/data_and_results';
 
-export type Champ = {   // this looks a lot like a Parameter + a label, maybe change the type?
+export interface Champ extends Parameter {   // this looks a lot like a Parameter + a label, maybe change the type?
   label: string,
-  name: keyof ParameterMap,
-  type_of_champ: "col" | "col_list" | "num" | "num_list",
-  default_value: string | Array<string> | number | Array<number>,
+  name: keyof ParameterMap
 }
 
 let props_from_parent = defineProps({
@@ -83,7 +81,7 @@ const parameters : ParameterMap = {} ;
 for (let i =0; i < props_from_parent.champs.length; i++) {
   let champ : Champ = props_from_parent.champs[i];
   let name : keyof ParameterMap  = champ.name as string;
-  parameters[name] = {"type_of_params": champ.type_of_champ, "value": champ.default_value}
+  parameters[name] = {"type_of_params": champ.type_of_champ, "value": champ.value}
 }
 
 const init_form = store.get_relevant_resultat(props_from_parent.endpoint_name, parameters);
@@ -173,7 +171,7 @@ async function post_form() {
 watch(() => store.data_csv, () => { reset_everything() });
 function reset_everything() {
   for (let i = 0; i < props_from_parent.champs.length; i++) {
-    array_of_champs.value[i][1].value = props_from_parent.champs[i].default_value
+    array_of_champs.value[i][1].value = props_from_parent.champs[i].value
   };
   res_from_post.value = ""
 }

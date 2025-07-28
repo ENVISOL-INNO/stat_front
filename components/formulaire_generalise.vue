@@ -37,6 +37,18 @@
     <NuxtImg v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
     <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
   </div>
+
+  <div>
+    <h1>Pyvista scene</h1>
+    <iframe>
+      src="C:/Users/AdrienROUSSEAU/OneDrive - ENVISOL/Bureau/donnees test appli/SWAG/testHTML"
+      width="100%"
+      height="600px"
+      frameborder="0"
+    </iframe>
+  </div>
+
+
 </template>
 
 <script lang="ts" setup>

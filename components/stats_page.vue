@@ -41,6 +41,17 @@
     <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
 
+  <!-- <div>
+    <ClientOnly>
+      <Visualisateur3DPyvista></Visualisateur3DPyvista>
+    </ClientOnly>
+  </div> -->
+
+  <div>
+    <ClientOnly>
+      <import_visualisateur_3D_pyvista></import_visualisateur_3D_pyvista>
+    </ClientOnly>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -50,6 +61,10 @@ import { useMyNavStore } from '~/stores/nav';
 import Formulaire_stats_de_base from '~/components/formulaire_stats_de_base.vue';
 import File_import from '~/components/file_import.vue';
 import type { Champ } from './formulaire_generalise.vue';
+// import Visualisateur3DPyvista from '~/components/test_visualisateur3D_pyvista.vue';
+import import_visualisateur_3D_pyvista from './import_visualisateur_3D_pyvista.vue';
+import { ClientOnly } from '#components';
+
 
 
 const store = useMyData_and_resultsStore();

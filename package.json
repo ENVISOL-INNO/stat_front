@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@internationalized/number": "^3.6.0",
+    "@kitware/vtk.js": "^34.7.0",
     "@mdi/font": "^7.4.47",
     "@nuxt/image": "^1.8.1",
     "@pinia/nuxt": "^0.7.0",

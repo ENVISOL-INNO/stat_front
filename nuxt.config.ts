@@ -30,7 +30,10 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ["plotly.js-dist-min"],
+      include: ["plotly.js-dist-min", '@kitware/vtk.js'],
+    },
+    define: {
+      global: {},
     },
   },
   // modules: ["vuetify-nuxt-module", "@pinia/nuxt", "@nuxt/image"],

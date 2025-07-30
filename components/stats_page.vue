@@ -53,7 +53,11 @@
     </ClientOnly>
   </div> -->
 
-
+  <div>
+    <ClientOnly>
+      <import_visualisateur_3D_pyvista_html></import_visualisateur_3D_pyvista_html>
+    </ClientOnly>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +71,9 @@ import type { Champ } from './formulaire_generalise.vue';
 // Component pour la visualisation 3D
 // import Visualisateur3DPyvista from '~/components/test_visualisateur3D_pyvista.vue';
 // import import_visualisateur_3D_pyvista_vtkJS from './import_visualisateur_3D_pyvista_vtkJS.vue';
-// import { ClientOnly } from '#components';
+import import_visualisateur_3D_pyvista_html from './import_visualisateur_3D_pyvista_html.vue';
+import { ClientOnly } from '#components';
+
 
 
 

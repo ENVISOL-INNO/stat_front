@@ -47,11 +47,13 @@
     </ClientOnly>
   </div> -->
 
-  <div>
+  <!-- <div>
     <ClientOnly>
-      <import_visualisateur_3D_pyvista></import_visualisateur_3D_pyvista>
+      <import_visualisateur_3D_pyvista_vtkJS></import_visualisateur_3D_pyvista_vtkJS>
     </ClientOnly>
-  </div>
+  </div> -->
+
+
 </template>
 
 <script setup lang="ts">
@@ -61,9 +63,11 @@ import { useMyNavStore } from '~/stores/nav';
 import Formulaire_stats_de_base from '~/components/formulaire_stats_de_base.vue';
 import File_import from '~/components/file_import.vue';
 import type { Champ } from './formulaire_generalise.vue';
+
+// Component pour la visualisation 3D
 // import Visualisateur3DPyvista from '~/components/test_visualisateur3D_pyvista.vue';
-import import_visualisateur_3D_pyvista from './import_visualisateur_3D_pyvista.vue';
-import { ClientOnly } from '#components';
+// import import_visualisateur_3D_pyvista_vtkJS from './import_visualisateur_3D_pyvista_vtkJS.vue';
+// import { ClientOnly } from '#components';
 
 
 

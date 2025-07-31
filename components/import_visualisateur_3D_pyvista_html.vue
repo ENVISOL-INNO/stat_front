@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue'
 const iframeSrc = ref('')
 
 onMounted(async () => {
+  //On récupère le fichier .json
   const res = await fetch('/testHTML.json')
   const data = await res.json()
 
@@ -12,6 +13,7 @@ onMounted(async () => {
     `<head><base href="${window.location.origin}/" />`
   )
 
+  // Création du BLOB nécessaire pour l'affichage dynamique.
   const blob = new Blob([htmlWithBase], { type: 'text/html' })
   iframeSrc.value = URL.createObjectURL(blob)
 })

@@ -40,6 +40,9 @@
   <div v-if="storeNav.show_hist">
     <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
+  <div v-if="storeNav.show_visGrid">
+    <FormulaireGeneralise name="Visualisation 3D de la grille" endpoint_name="/Visgrid" :champs=list_champ_vis_grid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  </div>
 
   <!-- <div>
     <ClientOnly>
@@ -53,11 +56,11 @@
     </ClientOnly>
   </div> -->
 
-  <div>
+  <!-- <div>
     <ClientOnly>
       <import_visualisateur_3D_pyvista_html></import_visualisateur_3D_pyvista_html>
     </ClientOnly>
-  </div>
+  </div> -->
 </template>
 
 <script setup lang="ts">
@@ -71,8 +74,8 @@ import type { Champ } from './formulaire_generalise.vue';
 // Component pour la visualisation 3D
 // import Visualisateur3DPyvista from '~/components/test_visualisateur3D_pyvista.vue';
 // import import_visualisateur_3D_pyvista_vtkJS from './import_visualisateur_3D_pyvista_vtkJS.vue';
-import import_visualisateur_3D_pyvista_html from './import_visualisateur_3D_pyvista_html.vue';
-import { ClientOnly } from '#components';
+// import import_visualisateur_3D_pyvista_html from './import_visualisateur_3D_pyvista_html.vue';
+// import { ClientOnly } from '#components';
 
 
 
@@ -98,6 +101,9 @@ const list_champ_swarmplot : Ref<Array<Champ>> = ref([
 const list_champ_boxplot : Ref<Array<Champ>> = ref([
   {label: "Somme à analyser", name: "sum_element", type_of_champ: "col", default_value: ""},
   {label: "Éléments dans la somme à analyser", name: "list_elements", type_of_champ: "col_list", default_value: []}
+])
+const list_champ_vis_grid : Ref<Array<Champ>> = ref([
+  {label: "Taille d'une cellule", name: "spacing", type_of_champ: "num_list", default_value: ""},
 ])
 
 </script>

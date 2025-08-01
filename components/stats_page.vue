@@ -40,7 +40,9 @@
   <div v-if="storeNav.show_hist">
     <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
-
+  <div v-if="storeNav.show_freq_cum">
+    <FormulaireGeneralise name="visualisation grid" endpoint_name="/VisGrid" :champs=list_champ_visgrid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -64,18 +66,20 @@ const list_champ_histo : Ref<Array<Champ>> = ref([
 const list_champ_freq_cum : Ref<Array<Champ>> = ref([
   {label: "Élément à analyser", name: "nom_elem", type_of_params: "col", value: ""},
   {label: "Colonne avec les noms d'échantillon", name: "nom_id_sample", type_of_params: "col", value: ""},
-  {label: "Nombre d'étiquette d'échantillon à afficher", name: "number_of_samples_to_show", type_of_params: "num", value: 0}
+  {label: "Nombre d'étiquette d'échantillon à afficher", name: "number_of_samples_to_show", type_of_params: "num", value: 0},
   {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
 ])
 const list_champ_swarmplot : Ref<Array<Champ>> = ref([
   {label: "Élément à analyser", name: "nom_elem", type_of_params: "col", value: ""},
-  {label: "Catégorie à analyser", name: "nom_classifier", type_of_params: "col", value: ""}
+  {label: "Catégorie à analyser", name: "nom_classifier", type_of_params: "col", value: ""},
   {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
 ])
 const list_champ_boxplot : Ref<Array<Champ>> = ref([
   {label: "Somme à analyser", name: "sum_element", type_of_params: "col", value: ""},
-  {label: "Éléments dans la somme à analyser", name: "list_elements", type_of_params: "col_list", value: []}
+  {label: "Éléments dans la somme à analyser", name: "list_elements", type_of_params: "col_list", value: []},
   {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
 ])
-
+const list_champ_visgrid : Ref<Array<Champ>> = ref([
+  {label: "Taille d'une cellule séparées par un espace ", name: "spacing", type_of_params: "num_list", value: ""},
+])
 </script>

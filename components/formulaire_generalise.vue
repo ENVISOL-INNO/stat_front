@@ -1,16 +1,19 @@
 <template>
   <h1>{{name}}</h1>
   <div v-for="i in array_of_champs.length">
-    <div v-if="array_of_champs[i-1][0].type_of_champ == 'col_list'">
+    <div v-if="array_of_champs[i-1][0].type_of_params == 'col_list'">
       <v-select v-model="array_of_champs[i-1][1].value" :items="store.colonnes" :label="champs[i-1].label" multiple></v-select>
     </div>
-    <div v-else-if="array_of_champs[i-1][0].type_of_champ == 'num'">
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'num'">
       <v-text-field v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label" type="number"></v-text-field>
     </div>
-    <div v-else-if="array_of_champs[i-1][0].type_of_champ == 'col'">
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'col'">
       <v-select v-model="array_of_champs[i-1][1].value" :items="store.colonnes" :label="champs[i-1].label"></v-select>
     </div>
-    <div v-else-if="array_of_champs[i-1][0].type_of_champ == 'num_list'">
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'num_list'">
+      <v-text-field v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></v-text-field>
+    </div>
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'string'">
       <v-text-field v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></v-text-field>
     </div>
     <div v-else>
@@ -81,14 +84,14 @@ const parameters : ParameterMap = {} ;
 for (let i =0; i < props_from_parent.champs.length; i++) {
   let champ : Champ = props_from_parent.champs[i];
   let name : keyof ParameterMap  = champ.name as string;
-  parameters[name] = {"type_of_params": champ.type_of_champ, "value": champ.value}
+  parameters[name] = {"type_of_params": champ.type_of_params, "value": champ.value}
 }
 
 const init_form = store.get_relevant_resultat(props_from_parent.endpoint_name, parameters);
 const init_form_params = init_form.parameters;
 console.log("init_form_params", init_form_params)
 
-let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number>]>> = ref([])
+let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number | number[]>]>> = ref([])
 
 
 // Prep the array of ref for the html template
@@ -115,21 +118,21 @@ async function post_form() {
   var body_params_only : ParameterMap = {}
 
   for (let i = 0; i < props_from_parent.champs.length; i++) {
-    if(array_of_champs.value[i][0].type_of_champ == "num") {
+    if(array_of_champs.value[i][0].type_of_params == "num") {
       body_json[array_of_champs.value[i][0].name] = Number(array_of_champs.value[i][1].value)
-      console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]))
-    } else if (array_of_champs.value[i][0].type_of_champ == "num_list") {
-      console.log("heeee", array_of_champs.value[i][1].value)
+      // console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]))
+    } else if (array_of_champs.value[i][0].type_of_params == "num_list") {
+      // console.log("heeee", array_of_champs.value[i][1].value)
       var full_string: String = String(array_of_champs.value[i][1].value); // This is a bit unnecessary, it simply unsures that full string is indeed a string
-      console.log("heeee", full_string)
+      // console.log("heeee", full_string)
       var list_str = full_string.split(' ');
-      console.log("heeee", list_str)
+      // console.log("heeee", list_str)
       body_json[array_of_champs.value[i][0].name] = list_str.map(s => Number(s))
-      console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
+      // console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
     } else {
       body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][1].value
     }
-    body_params_only[array_of_champs.value[i][0].name] = {type_of_params: array_of_champs.value[i][0].type_of_champ, value: array_of_champs.value[i][1].value}
+    body_params_only[array_of_champs.value[i][0].name] = {type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value}
   }
   body_json["dataframe"] = store.data_csv
 

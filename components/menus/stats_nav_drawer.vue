@@ -17,7 +17,7 @@
         <v-switch v-model="storeNav.show_boxplot" color="primary" label="Boxplots"></v-switch>
       </v-list-item>
       <v-list-item>
-        <v-switch v-model="storeNav.show_visGrid" color="primary" label="Visualisation 3D"></v-switch>
+        <v-switch v-model="storeNav.show_visgrid" color="primary" label="Visualisation 3D"></v-switch>
       </v-list-item>
     </v-list>
     <!-- <v-switch v-model="mode_spectro" color="primary" label="Spectro"></v-switch> -->

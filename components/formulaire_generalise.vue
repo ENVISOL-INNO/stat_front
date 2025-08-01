@@ -35,12 +35,12 @@
     les alertes ci dessus et corrigez le fichier d'entré en conséquence.
   </div>
 
-  <div v-if="res_from_post != '' && res_from_post != 'visGrid' && status_post != 'pending'">
+  <div v-if="res_from_post != '' && res_from_post != 'visrid' && status_post != 'pending'">
     <NuxtImg v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
     <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
   </div>
 
-  <div v-if="res_from_post == 'visGrid' && status_post != 'pending'">
+  <div v-if="res_from_post == 'visgrid' && status_post != 'pending'">
     <ClientOnly>
       <import_visualisateur_3D_pyvista_html></import_visualisateur_3D_pyvista_html>
     </ClientOnly>
@@ -116,6 +116,7 @@ for (let i = 0; i < props_from_parent.champs.length; i++) {
 // Post
 const runtimeConfig = useRuntimeConfig();
 const bck_end_base_url_ = runtimeConfig.public.backend_url_public;
+const bck_end_swag_url_ = runtimeConfig.public.backend_swag_url_public;
 
 const status_post = ref("");
 
@@ -146,7 +147,7 @@ async function post_form() {
   body_json["dataframe"] = store.data_csv
 
 
-  const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
+  const { data: res, status } = await useFetch(bck_end_swag_url_ + props_from_parent.endpoint_name, {
     method: 'POST',
     body: body_json,
     onRequest({ }) {

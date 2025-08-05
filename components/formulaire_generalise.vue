@@ -130,15 +130,15 @@ async function post_form() {
   for (let i = 0; i < props_from_parent.champs.length; i++) {
     if (array_of_champs.value[i][0].type_of_champ == "num") {
       body_json[array_of_champs.value[i][0].name] = Number(array_of_champs.value[i][1].value)
-      console.log("heeee", typeof (body_json[array_of_champs.value[i][0].name]))
+      console.log("heeee1", typeof (body_json[array_of_champs.value[i][0].name]))
     } else if (array_of_champs.value[i][0].type_of_champ == "num_list") {
-      console.log("heeee", array_of_champs.value[i][1].value)
+      console.log("heeee2", array_of_champs.value[i][1].value)
       var full_string: String = String(array_of_champs.value[i][1].value); // This is a bit unnecessary, it simply unsures that full string is indeed a string
-      console.log("heeee", full_string)
+      console.log("heeee3", full_string)
       var list_str = full_string.split(' ');
-      console.log("heeee", list_str)
+      console.log("heeee4", list_str)
       body_json[array_of_champs.value[i][0].name] = list_str.map(s => Number(s))
-      console.log("heeee", typeof (body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
+      console.log("heeee5", typeof (body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
     } else {
       body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][1].value
     }

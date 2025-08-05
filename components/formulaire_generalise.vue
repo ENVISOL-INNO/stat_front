@@ -9,7 +9,8 @@
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label" type="number"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_champ == 'col'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"></v-select>
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes"
+        :label="champs[i - 1].label"></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_champ == 'num_list'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></v-text-field>
@@ -35,14 +36,14 @@
     les alertes ci dessus et corrigez le fichier d'entré en conséquence.
   </div>
 
-  <div v-if="res_from_post != '' && res_from_post != 'visrid' && status_post != 'pending'">
+  <!-- <div v-if="res_from_post != '' && status_post != 'pending'">
     <NuxtImg v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
-    <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
-  </div>
+    <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
+  </div> -->
 
-  <div v-if="res_from_post == 'visgrid' && status_post != 'pending'">
+  <div v-if="res_from_post != '' && status_post != 'pending'">
     <ClientOnly>
-      <import_visualisateur_3D_pyvista_html></import_visualisateur_3D_pyvista_html>
+      <import_visualisateur_3D_pyvista_html :htmlContent="res_from_post"></import_visualisateur_3D_pyvista_html>
     </ClientOnly>
   </div>
 
@@ -154,16 +155,34 @@ async function post_form() {
       status_post.value = "pending";
     },
     onResponse({ request, response, options }) {
-      console.log("response._data", response._data);
-      res_from_post.value = response._data["fig"];    // TODO: this should also work when the endpoint does not return a fig
-      const res = new Resultat(
-        props_from_parent.endpoint_name,
-        body_params_only,
-        response._data["fig"],
-        response._data["name_fig"]
-      );
-      store.add_result(res);
-      status_post.value = "done"
+      if (response._data["fig"]) {
+        console.log("response._data FIG", response._data);
+        res_from_post.value = response._data["fig"];    // TODO: this should also work when the endpoint does not return a fig
+        const res = new Resultat(
+          props_from_parent.endpoint_name,
+          body_params_only,
+          response._data["fig"],
+          response._data["name_fig"]
+        );
+        store.add_result(res);
+        status_post.value = "done"
+      }
+      else if (response._data["html"]) {
+        console.log("response._data HTML", response._data);
+        console.log("type response", typeof(response._data['html']))
+        res_from_post.value = response._data["html"]; 
+        console.log("res_rom_value", response._data["html"])
+
+        const res = new Resultat(
+          props_from_parent.endpoint_name,
+          body_params_only,
+          response._data["html"],
+          "Modélisation"
+        );
+        store.add_result(res);
+        console.log("RES", res)
+        status_post.value = "done"
+      }
     },
     onRequestError({ request, response, options }) {
       // Handle the response errors

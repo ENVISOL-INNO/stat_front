@@ -17,6 +17,8 @@
 
 <script setup lang="ts">
 import * as PaPa from 'papaparse';
+import * as xlsx from 'xlsx';
+// import * as fs from 'fs';
 
 const runtimeConfig = useRuntimeConfig()
 const bck_end_base_url_ = runtimeConfig.public.backend_url_public;
@@ -39,16 +41,21 @@ let props_from_parent = defineProps({
 
 let headers_from_back = ref([]);
 let json_table_basic_stats = ref([]);
+let json_colonnes_dict = ref([]);
 
 async function post_stats_de_base() {
   const { data: res, status } = await useFetch(bck_end_base_url_+'/BasicStatistics', {
     method: 'POST',
     body: {"dataframe": props_from_parent.data},
+    onRequest({ request, options }) {
+        console.log("props_from_parent.data", props_from_parent.data);
+    },
     onResponse({ request, response, options }) {
       console.log("response._data", response._data);
       let colonnes_dict = response._data["colonnes_dict"];
-      console.log("colonnes_dict", colonnes_dict)
-      colonnes_dict = colonnes_dict.sort((a: { pos: number; }, b: { pos: number; }) => {return a.pos - b.pos})
+      console.log("colonnes_dict", colonnes_dict);
+      colonnes_dict = colonnes_dict.sort((a: { pos: number; }, b: { pos: number; }) => {return a.pos - b.pos});
+      json_colonnes_dict.value = colonnes_dict;
       headers_from_back.value = colonnes_dict.map(({nv_nom, nom}) => {return {title: nv_nom, value: nom}});
       console.log("headers_from_back", headers_from_back);
       json_table_basic_stats.value = response._data["list_stats"]
@@ -68,13 +75,29 @@ async function post_stats_de_base() {
  */
  function downloadBlob() {
   // fixed content for now
-  const content = arrayToCsv(json_table_basic_stats.value)
+  // const content = arrayToCsv(json_table_basic_stats.value)
 
+  // create json object from json_table_basic_stats.value with keys from json_colonnes_dict.value
+  const json_basic_stats = json_table_basic_stats.value.map((item) => {
+    const newItem = {};
+    json_colonnes_dict.value.forEach((col) => {
+      newItem[col.nv_nom] = item[col.nom];
+    });
+    return newItem;
+  });
+
+  const content = convertToXlsxCsv(json_basic_stats)
+  
   // fixed filename for now
-  const filename = 'export_statistiques_de_base.csv'
+  // const filename = 'export_statistiques_de_base.csv'
+  const filename = 'export_statistiques_de_base.xlsx'
 
   // Fixed content type for now
-  const contentType = 'text/csv;charset=utf-8;'
+  // const contentType = 'text/csv;charset=utf-8;'
+  // contentType to save in xlsx
+  const contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+  // const contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
 
   // Create a blob
   var blob = new Blob([content], { type: contentType });
@@ -86,6 +109,16 @@ async function post_stats_de_base() {
   pom.setAttribute('download', filename);
   pom.click();
 };
+
+
+// convert data to a xlsx blob
+function convertToXlsxCsv(data) {
+  const workbook = xlsx.utils.book_new();
+  const worksheet = xlsx.utils.json_to_sheet(data);
+  xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+  const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  return buffer;
+}
 
 
 /**
@@ -104,6 +137,28 @@ async function post_stats_de_base() {
   //   .join(',')  // comma-separated
   // ).join('\r\n');  // rows starting on new lines
 }
+
+// const convertToXlsxCsv = (jsonData: any[]) => {
+//   // Create a new workbook
+//   const workbook = xlsx.utils.book_new();
+
+//   // Add the JSON data to a new sheet
+//   const sheet = xlsx.utils.json_to_sheet(jsonData);
+
+//   // Add the sheet to the workbook
+//   xlsx.utils.book_append_sheet(workbook, sheet, 'Sheet 1');
+
+//   // Write the workbook to a file
+//   if (fileType === 'xlsx') {
+//     xlsx.writeFile(workbook, outputFilePath);
+//   } else if (fileType === 'csv') {
+//     const csvData = xlsx.utils.sheet_to_csv(sheet);
+//     fs.writeFileSync(outputFilePath, csvData);
+//   }
+
+//   console.log(`Conversion from JSON to ${fileType.toUpperCase()} successful!`);
+// };
+
 
 
 </script>

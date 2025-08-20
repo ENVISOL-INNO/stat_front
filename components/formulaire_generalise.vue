@@ -15,6 +15,9 @@
     <div v-else-if="array_of_champs[i - 1][0].type_of_champ == 'num_list'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></v-text-field>
     </div>
+    <div v-else-if="array_of_champs[i - 1][0].type_of_champ == 'file'">
+      <VFileInput v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></VFileInput>
+    </div>
     <div v-else>
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!!!!!!!! ERREUR le champs marche pas !!!!!!!!!
@@ -60,8 +63,8 @@ import Chiplist from './chiplist.vue';
 export type Champ = {   // this looks a lot like a Parameter + a label, maybe change the type?
   label: string,
   name: keyof ParameterMap,
-  type_of_champ: "col" | "col_list" | "num" | "num_list",
-  default_value: string | Array<string> | number | Array<number>,
+  type_of_champ: "col" | "col_list" | "num" | "num_list" | 'file',
+  default_value: string | Array<string> | number | Array<number> | {} ,
 }
 
 let props_from_parent = defineProps({
@@ -101,7 +104,7 @@ const init_form = store.get_relevant_resultat(props_from_parent.endpoint_name, p
 const init_form_params = init_form.parameters;
 console.log("init_form_params", init_form_params)
 
-let array_of_champs: Ref<Array<[Champ, Ref<string | string[] | number>]>> = ref([])
+let array_of_champs: Ref<Array<[Champ, Ref<string | string[] | number | {}>]>> = ref([])
 
 
 // Prep the array of ref for the html template
@@ -140,7 +143,22 @@ async function post_form() {
       console.log("heeee4", list_str)
       body_json[array_of_champs.value[i][0].name] = list_str.map(s => Number(s))
       console.log("heeee5", typeof (body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
-    } else {
+    }
+    else if (array_of_champs.value[i][0].type_of_champ == "file"){
+      const csv_file = array_of_champs.value[i][1].value; 
+      console.log(csv_file)
+      if(csv_file.name){
+        const arrayBuffer = await csv_file.arrayBuffer();
+        console.log("AAABUFF",arrayBuffer)
+        const uint8Array = new Uint8Array(arrayBuffer);
+        console.log("UINT",uint8Array)
+        body_json[array_of_champs.value[i][0].name] = {data: Array.from(uint8Array), name:csv_file?.name, type:csv_file?.type}
+        console.log(body_json[array_of_champs.value[i][0].name])
+      } else {
+        body_json[array_of_champs.value[i][0].name] = {}
+      }
+    } 
+    else {
       body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][1].value
     }
     body_params_only[array_of_champs.value[i][0].name] = { type_of_params: array_of_champs.value[i][0].type_of_champ, value: array_of_champs.value[i][1].value }
@@ -168,10 +186,7 @@ async function post_form() {
         status_post.value = "done"
       }
       else if (response._data["html"]) {
-        console.log("response._data HTML", response._data);
-        console.log("type response", typeof(response._data['html']))
         res_from_post.value = response._data["html"]; 
-        console.log("res_rom_value", response._data["html"])
 
         const res = new Resultat(
           props_from_parent.endpoint_name,

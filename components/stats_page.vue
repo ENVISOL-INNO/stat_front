@@ -103,7 +103,13 @@ const list_champ_boxplot : Ref<Array<Champ>> = ref([
   {label: "Éléments dans la somme à analyser", name: "list_elements", type_of_champ: "col_list", default_value: []}
 ])
 const list_champ_vis_grid : Ref<Array<Champ>> = ref([
-  {label: "Taille d'une cellule", name: "spacing", type_of_champ: "num_list", default_value: ""},
+  {label: "Taille d'une cellule - X Y Z", name: "spacing", type_of_champ: "num_list", default_value: ""},
+  {label: "Elément à faire apparaitre sur le modèle", name: "colonne_modele", type_of_champ: 'col', default_value: ""},
+  {label: "Elément à faire apparaitre sur les points", name: "colonne_points", type_of_champ: 'col', default_value: ""},
+  {label: "Fichier image pour une superposition 2D", name: "file_2D", type_of_champ: 'file', default_value: {}},
+  {label: "Fichier image pour une superposition 3D", name: "file_3D", type_of_champ: 'file', default_value: {}},
+  {label: "Fichier topographie (obligatoire avec fichier 3D)", name: "topo_3D", type_of_champ: 'file', default_value: {}},
+
 ])
 
 </script>

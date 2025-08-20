@@ -41,7 +41,6 @@ watch(files, Read_File);
 
 
 async function Read_File() {
-  console.log('file1', files.value)
   const csv_file = files.value; // const csv_file = files.value[0] en temps normal
   console.log("file", csv_file);
   let reader = new FileReader();

@@ -40,7 +40,7 @@
   <div v-if="storeNav.show_hist">
     <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
-  <div v-if="storeNav.show_freq_cum">
+  <div v-if="storeNav.show_freq_cum && mode == 'spectro'">
     <FormulaireGeneralise name="visualisation grid" endpoint_name="/VisGrid" :champs=list_champ_visgrid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
 </template>
@@ -54,6 +54,7 @@ import File_import from '~/components/file_import.vue';
 import type { Champ } from './formulaire_generalise.vue';
 
 
+const mode = useRuntimeConfig().public.mode;
 const store = useMyData_and_resultsStore();
 const storeNav = useMyNavStore();
 
@@ -72,7 +73,7 @@ const list_champ_freq_cum : Ref<Array<Champ>> = ref([
 const list_champ_swarmplot : Ref<Array<Champ>> = ref([
   {label: "Élément à analyser", name: "nom_elem", type_of_params: "col", value: ""},
   {label: "Catégorie à analyser", name: "nom_classifier", type_of_params: "col", value: ""},
-  {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
+  // {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
 ])
 const list_champ_boxplot : Ref<Array<Champ>> = ref([
   {label: "Somme à analyser", name: "sum_element", type_of_params: "col", value: ""},

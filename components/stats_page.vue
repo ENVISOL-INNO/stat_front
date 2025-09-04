@@ -40,8 +40,8 @@
   <div v-if="storeNav.show_hist">
     <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
-  <div v-if="storeNav.show_visgrid">
-    <FormulaireGeneralise name="Visualisation 3D de la grille" endpoint_name="/visgrid" :champs=list_champ_vis_grid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  <div v-if="storeNav.show_visgrid_json">
+    <FormulaireGeneralise name="Visualisation 3D de la grille" endpoint_name="/visgrid_json" :champs=list_champ_vis_grid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
 
   <!-- <div>

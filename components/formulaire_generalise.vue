@@ -44,11 +44,23 @@
     <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
   </div> -->
 
+  <p v-if='error_from_swag == true'>VOUS NE POUVEZ PAS SELECTIONNER X OU Y POUR LES VALEURS A AFFICHER SUR LES POINTS</p>
   <div v-if="res_from_post != '' && status_post != 'pending'">
-    <ClientOnly>
+    <!-- <ClientOnly>
       <import_visualisateur_3D_pyvista_html :htmlContent="res_from_post"></import_visualisateur_3D_pyvista_html>
+    </ClientOnly> -->
+    <ClientOnly>
+      <Import_visualisateur_3D_pyvista_json :jsonContent="res_from_post"></Import_visualisateur_3D_pyvista_json>
     </ClientOnly>
   </div>
+
+  <div>
+    <ClientOnly>
+      <ImportVisualisateur3DPyvistaVtkJS></ImportVisualisateur3DPyvistaVtkJS>
+    </ClientOnly>
+  </div>
+
+
 
 
 </template>
@@ -58,6 +70,9 @@ import { useMyData_and_resultsStore, useMySpectraStore, Resultat } from '~/store
 import type { ParameterMap } from '~/stores/data_and_results';
 import chiplist from './chiplist.vue';
 import Chiplist from './chiplist.vue';
+import { consoleError } from 'vuetify/lib/util/console.mjs';
+import Import_visualisateur_3D_pyvista_json from './import_visualisateur_3D_pyvista_json.vue';
+import Import_visualisateur_3D_pyvista_html from './import_visualisateur_3D_pyvista_html.vue';
 // import type { AllowedParameters, ParameterMap } from '~/stores/data_and_results';
 
 export type Champ = {   // this looks a lot like a Parameter + a label, maybe change the type?
@@ -116,6 +131,9 @@ for (let i = 0; i < props_from_parent.champs.length; i++) {
   array_of_champs.value.push([champ, ref(init_form_params[name as keyof ParameterMap].value)]);
 }
 
+// Error from swag
+
+const error_from_swag = ref(false)
 
 // Post
 const runtimeConfig = useRuntimeConfig();
@@ -130,7 +148,7 @@ async function post_form() {
 
   var body_json: { [id: string]: unknown } = {}
   var body_params_only: ParameterMap = {}
-
+  error_from_swag.value = false
   for (let i = 0; i < props_from_parent.champs.length; i++) {
     if (array_of_champs.value[i][0].type_of_champ == "num") {
       body_json[array_of_champs.value[i][0].name] = Number(array_of_champs.value[i][1].value)
@@ -173,6 +191,7 @@ async function post_form() {
       status_post.value = "pending";
     },
     onResponse({ request, response, options }) {
+      console.log("Scene :", typeof(response._data), response._data)
       if (response._data["fig"]) {
         console.log("response._data FIG", response._data);
         res_from_post.value = response._data["fig"];    // TODO: this should also work when the endpoint does not return a fig
@@ -185,13 +204,21 @@ async function post_form() {
         store.add_result(res);
         status_post.value = "done"
       }
-      else if (response._data["html"]) {
-        res_from_post.value = response._data["html"]; 
-
+      else if (response._data == "erreur"){
+          console.log('erreur')
+          error_from_swag.value = true 
+          console.log(error_from_swag.value)
+          status_post.value = "done"
+          return
+      }
+      else if (response._data["scene"]) {
+        console.log('erreur 2')
+        
+        res_from_post.value = response._data; 
         const res = new Resultat(
           props_from_parent.endpoint_name,
           body_params_only,
-          response._data["html"],
+          response._data["scene"],
           "Modélisation"
         );
         store.add_result(res);

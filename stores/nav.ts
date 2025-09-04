@@ -15,7 +15,7 @@ export const useMyNavStore = defineStore({
       show_boxplot: false,
       show_freq_cum: false,
       show_hist: false,
-      show_visgrid: false,
+      show_visgrid_json: false,
     }
   },
   actions: {

@@ -23,6 +23,7 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
 import vtkPlaneSource from '@kitware/vtk.js/Filters/Sources/PlaneSource';
 import vtkWarpScalar from '@kitware/vtk.js/Filters/General/WarpScalar';
 import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
+import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
 
 const props_from_parent = defineProps({
   jsonContent: {
@@ -83,29 +84,51 @@ onMounted(() => {
     imageData.setSpacing(...spacing);
 
     // --- Associer les scalaires
-    if (cell_data.values){
+    if (cell_data.values) {
+      // --- Min/Max pour les différentes calculs et pour bien spécifier les intervalles d'intérêts
+      const origValues = cell_data.values;
+      const dataMin = Math.min(...origValues);
+      const dataMax = Math.max(...origValues);
+
+      // --- Choix d'une valeur sentinel en dehors de l'intervalle réel (0..5)
+      const MASK = -9999;
+
+      // --- Construction du tableau "masked" : si site==1 => MASK (masqué), sinon garder la valeur
+      const maskedValues = new Float32Array(origValues.length);
+      for (let i = 0; i < origValues.length; i++) {
+        maskedValues[i] = (cell_data.site[i] === 1) ? MASK : origValues[i];
+      }
+
+      // --- Création du vtkDataArray à partir de maskedValues (on garde le nom "values")
       const scalars = vtkDataArray.newInstance({
         name: "values",
         numberOfComponents: 1,
-        values: new Float32Array(cell_data.values),
+        values: maskedValues,
       });
       imageData.getPointData().setScalars(scalars);
 
-      // --- Définir min et max pour le rendu
-      const values = imageData.getPointData().getScalars().getData();
-      const min = Math.min(...values);
-      const max = Math.max(...values);
+      // --- Couleur : définir la colorFunction uniquement sur dataMin..dataMax
       const colorFunction = vtkColorTransferFunction.newInstance();
-      colorFunction.addRGBPoint(min, 1,0,1);
-      colorFunction.addRGBPoint(max, 0, 0, 0.8);
+      colorFunction.addRGBPoint(dataMin, 0, 0, 1);
+      colorFunction.addRGBPoint(dataMax, 1, 0, 1);
 
-      // --- Affichage du volume
+      // --- Opacité : MASK -> 0 (invisible), tout le reste entre dataMin..dataMax -> 1 (visible)
+      const opacityFunction = vtkPiecewiseFunction.newInstance();
+      opacityFunction.addPoint(MASK, 0);       // toutes les cellules masquées => totalement transparentes
+      opacityFunction.addPoint(dataMin, 1);    // bornes visibles
+      opacityFunction.addPoint(dataMax, 1);
+
+      // --- Mapper couleur / opacité
       const volumeMapper = vtkVolumeMapper.newInstance();
       volumeMapper.setInputData(imageData);
+
       const volume = vtkVolume.newInstance();
       volume.setMapper(volumeMapper);
+      volume.getProperty().setInterpolationTypeToNearest();
       volume.getProperty().setRGBTransferFunction(0, colorFunction);
-      volume.getProperty().setScalarOpacityUnitDistance(0, 2.0);
+      volume.getProperty().setScalarOpacity(0, opacityFunction);
+      volume.getProperty().setScalarOpacityUnitDistance(0, 2);
+
       renderer.addVolume(volume);
 
       // --- Barre scalaire
@@ -113,20 +136,23 @@ onMounted(() => {
       scalarBarActor.setScalarsToColors(colorFunction);
       scalarBarActor.setAxisLabel('G_values');
       scalarBarActor.setAxisTextStyle({ fontSize: 14, fontColor: 'black' });
-      scalarBarActor.setTickTextStyle({fontColor : "black"})
+      scalarBarActor.setTickTextStyle({ fontColor: "black" });
+      scalarBarActor.setAutomated(false);
+      scalarBarActor.setBoxSize([0.15, 1.6]);
+      scalarBarActor.setBoxPosition([0.85, -0.92]);
       renderer.addActor(scalarBarActor);
     }
 
-    // --- Grille 3D pour wireframe /!\ NON FINALISE
+    // --- Cube wireframe autour de la grille
     const bounds = imageData.getBounds();
     const cubeSource = vtkCubeSource.newInstance({
-      xLength: bounds[1]-bounds[0],
-      yLength: bounds[3]-bounds[2],
-      zLength: bounds[5]-bounds[4],
+      xLength: bounds[1] - bounds[0],
+      yLength: bounds[3] - bounds[2],
+      zLength: bounds[5] - bounds[4],
       center: [
-        (bounds[0]+bounds[1])/2,
-        (bounds[2]+bounds[3])/2,
-        (bounds[4]+bounds[5])/2
+        (bounds[0] + bounds[1]) / 2,
+        (bounds[2] + bounds[3]) / 2,
+        (bounds[4] + bounds[5]) / 2
       ]
     });
 
@@ -136,7 +162,7 @@ onMounted(() => {
     const cubeActor = vtkActor.newInstance();
     cubeActor.setMapper(cubeMapper);
     cubeActor.getProperty().setRepresentation(1); // wireframe
-    cubeActor.getProperty().setColor(0,0,0);
+    cubeActor.getProperty().setColor(0, 0, 0);
     renderer.addActor(cubeActor);
   }
 
@@ -220,8 +246,8 @@ onMounted(() => {
       console.log("Value extrem",minVal, maxVal)
 
       const colorFunction = vtkColorTransferFunction.newInstance();
-      colorFunction.addRGBPoint(minVal, 0, 0, 1);   // bleu pour le minimum
-      colorFunction.addRGBPoint(maxVal, 1, 0, 0);   // rouge pour le maximum
+      colorFunction.addRGBPoint(minVal, 0, 0, 1);   
+      colorFunction.addRGBPoint(maxVal, 1, 0, 1);   
 
       // --- Taille des points
       const sphereSource = vtkSphereSource.newInstance({
@@ -251,6 +277,10 @@ onMounted(() => {
       scalarBarActor.setAxisLabel('P_values');
       scalarBarActor.setAxisTextStyle({ fontSize: 14, fontColor: 'black' });
       scalarBarActor.setTickTextStyle({fontColor : "black"})
+
+      scalarBarActor.setAutomated(false);
+      scalarBarActor.setBoxSize([0.15, 1.6]);          
+      scalarBarActor.setBoxPosition([0.73, -0.92]); // bord droit (0.98) - largeur
       renderer.addActor(scalarBarActor);
     }
   }
@@ -299,81 +329,86 @@ onMounted(() => {
   }
 
   console.log(scene.topographie, scene.texture3D)
-  if (scene.topographie && scene.texture3D) {
-  const topoBytes = scene.topographie.data;  // tableau d’octets CSV
-  const textureData = scene.texture3D;       // { data: base64, type: 'image/png' }
+    if (scene.topographie && scene.texture3D) {
+    const topoBytes = scene.topographie.data;  // tableau d’octets CSV
+    const textureData = scene.texture3D;       // { data: base64, type: 'image/png' }
 
-  // --- Convertir le tableau d'octets en texte CSV
-  const csvText = new TextDecoder().decode(new Uint8Array(topoBytes));
-  const lines = csvText.split(/\r?\n/).filter((l) => l.trim() !== '');
-  const topoPoints = lines.slice(1).map((line) => {
-    const [x, y, z] = line.split(';').map(Number);
-    return { x, y, z };
-  });
+    // --- Convertir le tableau d'octets en texte CSV
+    const csvText = new TextDecoder().decode(new Uint8Array(topoBytes));
+    const lines = csvText.split(/\r?\n/).filter((l) => l.trim() !== '');
+    const topoPoints = lines.slice(1).map((line) => {
+      const [x, y, z] = line.split(';').map(Number);
+      return { x, y, z };
+    });
 
-  // --- Extraire valeurs uniques pour la grille
-  const xUnique = [...new Set(topoPoints.map(p => p.x))].sort((a, b) => a - b);
-  const yUnique = [...new Set(topoPoints.map(p => p.y))].sort((a, b) => a - b);
-  const nx = xUnique.length;
-  const ny = yUnique.length;
+    // --- Extraire valeurs uniques pour la grille
+    const xUnique = [...new Set(topoPoints.map(p => p.x))].sort((a, b) => a - b);
+    const yUnique = [...new Set(topoPoints.map(p => p.y))].sort((a, b) => a - b);
+    const nx = xUnique.length;
+    const ny = yUnique.length;
 
-  // --- Valeurs Z par point
-  const pointValues = new Float32Array(nx * ny);
-  topoPoints.forEach((p) => {
-    const i = xUnique.indexOf(p.x);
-    const j = yUnique.indexOf(p.y);
-    pointValues[i + j * nx] = -p.z; // inverser Z si nécessaire
-  });
+    // --- Valeurs Z par point
+    const pointValues = new Float32Array(nx * ny);
+    topoPoints.forEach((p) => {
+      const i = xUnique.indexOf(p.x);
+      const j = yUnique.indexOf(p.y);
+      pointValues[i + j * nx] = -p.z; // inverser Z si nécessaire
+    });
 
-  // --- Déterminer les bounds
-  const imageData = vtkImageData.newInstance();
-  imageData.setDimensions(...scene.grid.dimensions);
-  imageData.setOrigin(...scene.grid.origin);
-  imageData.setSpacing(...scene.grid.spacing);
+    // --- Déterminer les bounds
+    const imageData = vtkImageData.newInstance();
+    imageData.setDimensions(...scene.grid.dimensions);
+    imageData.setOrigin(...scene.grid.origin);
+    imageData.setSpacing(...scene.grid.spacing);
 
-  const [xmin, xmax, ymin, ymax, zmin, zmax] = imageData.getBounds();
+    const [xmin, xmax, ymin, ymax, zmin, zmax] = imageData.getBounds();
 
-  // --- Créer le plan aligné sur les bounds
-  const plane = vtkPlaneSource.newInstance({
-    origin: [xmax, ymin, 0],   // bas-gauche
-    point1: [xmin, ymin, 0],   // bas-droit
-    point2: [xmax, ymax, 0],   // haut-gauche
-    xResolution: nx - 1,
-    yResolution: ny - 1,
-  });
+    // --- Créer le plan aligné sur les bounds
+    const plane = vtkPlaneSource.newInstance({
+      origin: [xmax, ymin, 0],   // bas-gauche
+      point1: [xmin, ymin, 0],   // bas-droit
+      point2: [xmax, ymax, 0],   // haut-gauche
+      xResolution: nx - 1,
+      yResolution: ny - 1,
+    });
 
-  // --- Appliquer les valeurs Z sur les points
-  const planePolyData = plane.getOutputData();
-  const planePoints = planePolyData.getPoints().getData();
+    // --- Appliquer les valeurs Z sur les points
+    const planePolyData = plane.getOutputData();
+    const planePoints = planePolyData.getPoints().getData();
 
-  for (let j = 0; j < ny; j++) {
-    for (let i = 0; i < nx; i++) {
-      const idx = i + j * nx;
-      planePoints[3 * idx + 2] = pointValues[idx]; // Z
+    for (let j = 0; j < ny; j++) {
+      for (let i = 0; i < nx; i++) {
+        const idx = i + j * nx;
+        planePoints[3 * idx + 2] = pointValues[idx]; // Z
+      }
     }
+
+    // --- Créer la texture
+    const img = new Image();
+    img.src = `data:${textureData.type};base64,${textureData.data}`;
+    img.onload = () => {
+      const texture = vtkTexture.newInstance();
+      texture.setImage(img);
+
+      const mapper = vtkMapper.newInstance();
+      mapper.setInputData(planePolyData);
+
+      const actor = vtkActor.newInstance();
+      actor.setMapper(mapper);
+      actor.addTexture(texture);
+
+      renderer.addActor(actor);
+      renderWindow.render();
+    };
   }
-
-  // --- Créer la texture
-  const img = new Image();
-  img.src = `data:${textureData.type};base64,${textureData.data}`;
-  img.onload = () => {
-    const texture = vtkTexture.newInstance();
-    texture.setImage(img);
-
-    const mapper = vtkMapper.newInstance();
-    mapper.setInputData(planePolyData);
-
-    const actor = vtkActor.newInstance();
-    actor.setMapper(mapper);
-    actor.addTexture(texture);
-
-    renderer.addActor(actor);
-    renderWindow.render();
-  };
-}
 
 
   renderer.resetCamera();
+  const camera = renderer.getActiveCamera();
+
+  // tu peux aussi inverser le viewUp si nécessaire
+  camera.setViewUp([0, -1, 0]);
+  
   // autoZoom(renderer)
   renderWindow.render();
   console.log('Nombre d’acteurs :', renderer.getActors().length);

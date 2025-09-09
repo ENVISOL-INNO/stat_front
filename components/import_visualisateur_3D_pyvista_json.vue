@@ -24,6 +24,8 @@ import vtkPlaneSource from '@kitware/vtk.js/Filters/Sources/PlaneSource';
 import vtkWarpScalar from '@kitware/vtk.js/Filters/General/WarpScalar';
 import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
 import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
+import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor';
+
 
 const props_from_parent = defineProps({
   jsonContent: {
@@ -72,7 +74,6 @@ onMounted(() => {
   // ------------- Pour l'ajout de la grille de base
   if (scene.grid) {
     const { dimensions, origin, spacing, cell_data } = scene.grid;
-    console.log("cell_dtat",cell_data.values)
 
     // --- Correction des dimensions pour rester cohérent
     dimensions[0] -= 1;
@@ -143,7 +144,7 @@ onMounted(() => {
       renderer.addActor(scalarBarActor);
     }
 
-    // --- Cube wireframe autour de la grille
+    // --- CONTOUR - Cube wireframe
     const bounds = imageData.getBounds();
     const cubeSource = vtkCubeSource.newInstance({
       xLength: bounds[1] - bounds[0],
@@ -164,7 +165,42 @@ onMounted(() => {
     cubeActor.getProperty().setRepresentation(1); // wireframe
     cubeActor.getProperty().setColor(0, 0, 0);
     renderer.addActor(cubeActor);
+
+    // --- TICK sur le contour du modèle /§\ Ne fais pas le grillage
+    const cubeAxes = vtkCubeAxesActor.newInstance()
+    cubeAxes.setDataBounds(bounds)
+    cubeAxes.setGridLines(true)
+    cubeAxes.setAxisLabels(['X', 'Y', 'Z']);           // titres axes
+    cubeAxes.setTickLabelPixelOffset(4);
+    cubeAxes.setAxisTitlePixelOffset(12);
+    cubeAxes.setTickTextStyle({ fontSize: 14, fontColor: 'black', style: 'bold' })
+    cubeAxes.setAxisTextStyle({ fontSize: 14, fontColor: 'black', style: 'bold' })
+    cubeAxes.setCamera(renderer.getActiveCamera());
+
+    renderer.addActor(cubeAxes)
+
+    
+    // GRILLE XY sur le cube /!\ Ne correspond pas aux tick 
+    const plane = vtkPlaneSource.newInstance({
+      origin: [bounds[0], bounds[2], bounds[4]],
+      point1: [bounds[1], bounds[2], bounds[4]],
+      point2: [bounds[0], bounds[3], bounds[4]],
+      xResolution: 4,  // nb divisions X
+      yResolution: 4,  // nb divisions Y
+    });
+
+    const gridMapper = vtkMapper.newInstance();
+    gridMapper.setInputConnection(plane.getOutputPort());
+
+    const gridActor = vtkActor.newInstance();
+    gridActor.setMapper(gridMapper);
+    gridActor.getProperty().setRepresentation(1); // mode filaire
+    gridActor.getProperty().setColor(0.7, 0.7, 0.7); // gris clair
+
+    renderer.addActor(gridActor);
   }
+
+  
 
   // ------------- Pour l'ajout des points en surface
   if (scene.points_surface) {
@@ -328,12 +364,11 @@ onMounted(() => {
     };
   }
 
-  console.log(scene.topographie, scene.texture3D)
-    if (scene.topographie && scene.texture3D) {
+  if (scene.topographie && scene.texture3D) {
     const topoBytes = scene.topographie.data;  // tableau d’octets CSV
     const textureData = scene.texture3D;       // { data: base64, type: 'image/png' }
 
-    // --- Convertir le tableau d'octets en texte CSV
+    // --- Convertion du tableau d'octets en texte CSV
     const csvText = new TextDecoder().decode(new Uint8Array(topoBytes));
     const lines = csvText.split(/\r?\n/).filter((l) => l.trim() !== '');
     const topoPoints = lines.slice(1).map((line) => {
@@ -341,7 +376,7 @@ onMounted(() => {
       return { x, y, z };
     });
 
-    // --- Extraire valeurs uniques pour la grille
+    // --- Extraction des valeurs uniques pour la grille
     const xUnique = [...new Set(topoPoints.map(p => p.x))].sort((a, b) => a - b);
     const yUnique = [...new Set(topoPoints.map(p => p.y))].sort((a, b) => a - b);
     const nx = xUnique.length;
@@ -355,7 +390,7 @@ onMounted(() => {
       pointValues[i + j * nx] = -p.z; // inverser Z si nécessaire
     });
 
-    // --- Déterminer les bounds
+    // --- Détermination des limites de la grille
     const imageData = vtkImageData.newInstance();
     imageData.setDimensions(...scene.grid.dimensions);
     imageData.setOrigin(...scene.grid.origin);
@@ -363,16 +398,16 @@ onMounted(() => {
 
     const [xmin, xmax, ymin, ymax, zmin, zmax] = imageData.getBounds();
 
-    // --- Créer le plan aligné sur les bounds
+    // --- Création du plan aligné sur les bounds
     const plane = vtkPlaneSource.newInstance({
-      origin: [xmax, ymin, 0],   // bas-gauche
-      point1: [xmin, ymin, 0],   // bas-droit
-      point2: [xmax, ymax, 0],   // haut-gauche
+      origin: [xmax, ymin, 0],   // bas-droit
+      point1: [xmin, ymin, 0],   // bas-gauche
+      point2: [xmax, ymax, 0],   // haut-droit
       xResolution: nx - 1,
       yResolution: ny - 1,
     });
 
-    // --- Appliquer les valeurs Z sur les points
+    // --- Application les valeurs Z sur les points
     const planePolyData = plane.getOutputData();
     const planePoints = planePolyData.getPoints().getData();
 
@@ -383,7 +418,7 @@ onMounted(() => {
       }
     }
 
-    // --- Créer la texture
+    // --- Création de la texture
     const img = new Image();
     img.src = `data:${textureData.type};base64,${textureData.data}`;
     img.onload = () => {
@@ -402,30 +437,17 @@ onMounted(() => {
     };
   }
 
-
   renderer.resetCamera();
   const camera = renderer.getActiveCamera();
-
-  // tu peux aussi inverser le viewUp si nécessaire
-  camera.setViewUp([0, -1, 0]);
-  
-  // autoZoom(renderer)
+  const fp = camera.getFocalPoint();
+  camera.setPosition(fp[0], fp[1], fp[2] - 250);  // en dessous du volume
+  camera.setFocalPoint(...fp);
+  camera.setViewUp([0, 1, 0]);  // vertical normal
+  renderer.resetCameraClippingRange();
   renderWindow.render();
   console.log('Nombre d’acteurs :', renderer.getActors().length);
 });
 
-// function autoZoom(renderer, targetSize = 100) {
-//   const bounds = renderer.computeVisiblePropBounds();
-//   const xSize = bounds[1] - bounds[0];
-//   const ySize = bounds[3] - bounds[2];
-//   const zSize = bounds[5] - bounds[4];
-//   const maxSize = Math.max(xSize, ySize, zSize);
-
-//   if (maxSize > 0) {
-//     const factor = maxSize / targetSize;
-//     renderer.getActiveCamera().zoom(factor);
-//   }
-// }
 </script>
 
 <template>

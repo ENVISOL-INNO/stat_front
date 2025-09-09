@@ -26,6 +26,8 @@ import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPl
 import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
 import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor';
 
+import * as d3scale from 'd3-scale';
+import * as d3array from 'd3-array';
 
 const props_from_parent = defineProps({
   jsonContent: {
@@ -53,7 +55,7 @@ onMounted(() => {
       height: '100%',
       position: 'relative',
     },
-    background: [1, 1, 1],
+    background: [0.5, 0.5, 0.5],
   });
 
   const renderer = fullScreenRenderer.getRenderer();
@@ -144,60 +146,32 @@ onMounted(() => {
       renderer.addActor(scalarBarActor);
     }
 
-    // --- CONTOUR - Cube wireframe
+    // --- QUADRILLAGE sur le modèle 
     const bounds = imageData.getBounds();
-    const cubeSource = vtkCubeSource.newInstance({
-      xLength: bounds[1] - bounds[0],
-      yLength: bounds[3] - bounds[2],
-      zLength: bounds[5] - bounds[4],
-      center: [
-        (bounds[0] + bounds[1]) / 2,
-        (bounds[2] + bounds[3]) / 2,
-        (bounds[4] + bounds[5]) / 2
-      ]
-    });
+    const cubeAxes = vtkCubeAxesActor.newInstance();
+    cubeAxes.setDataBounds(bounds);
+    console.log(bounds, spacing)
+    function myGenerateTicks(dataBounds) {
+      const res = vtkCubeAxesActor.defaultGenerateTicks(dataBounds);
+      const scale = d3scale.scaleLinear().domain([dataBounds[0], dataBounds[1]]);
+      res.ticks[0] = d3array.range(dataBounds[0], dataBounds[1], spacing[0]);
+      res.ticks[1] = d3array.range(dataBounds[2], dataBounds[3], spacing[1]);
+      res.ticks[2] = d3array.range(dataBounds[4]+0.25, dataBounds[5]+0.25, spacing[2]);
+      const format0 = scale.tickFormat(res.ticks[0].length);
+      const format1 = scale.tickFormat(res.ticks[1].length);
+      const format2 = scale.tickFormat(spacing[2].length, ".2f");
+      res.tickStrings[0] = res.ticks[0].map(format0);
+      res.tickStrings[1] = res.ticks[1].map(format1);
+      res.tickStrings[2] = res.ticks[2].map(format2);
+      return res;
+    }
 
-    const cubeMapper = vtkMapper.newInstance();
-    cubeMapper.setInputConnection(cubeSource.getOutputPort());
-
-    const cubeActor = vtkActor.newInstance();
-    cubeActor.setMapper(cubeMapper);
-    cubeActor.getProperty().setRepresentation(1); // wireframe
-    cubeActor.getProperty().setColor(0, 0, 0);
-    renderer.addActor(cubeActor);
-
-    // --- TICK sur le contour du modèle /§\ Ne fais pas le grillage
-    const cubeAxes = vtkCubeAxesActor.newInstance()
-    cubeAxes.setDataBounds(bounds)
-    cubeAxes.setGridLines(true)
-    cubeAxes.setAxisLabels(['X', 'Y', 'Z']);           // titres axes
-    cubeAxes.setTickLabelPixelOffset(4);
-    cubeAxes.setAxisTitlePixelOffset(12);
+    cubeAxes.setGenerateTicks(myGenerateTicks);
     cubeAxes.setTickTextStyle({ fontSize: 14, fontColor: 'black', style: 'bold' })
     cubeAxes.setAxisTextStyle({ fontSize: 14, fontColor: 'black', style: 'bold' })
+    cubeAxes.getProperty().setColor(0,0,0)
     cubeAxes.setCamera(renderer.getActiveCamera());
-
-    renderer.addActor(cubeAxes)
-
-    
-    // GRILLE XY sur le cube /!\ Ne correspond pas aux tick 
-    const plane = vtkPlaneSource.newInstance({
-      origin: [bounds[0], bounds[2], bounds[4]],
-      point1: [bounds[1], bounds[2], bounds[4]],
-      point2: [bounds[0], bounds[3], bounds[4]],
-      xResolution: 4,  // nb divisions X
-      yResolution: 4,  // nb divisions Y
-    });
-
-    const gridMapper = vtkMapper.newInstance();
-    gridMapper.setInputConnection(plane.getOutputPort());
-
-    const gridActor = vtkActor.newInstance();
-    gridActor.setMapper(gridMapper);
-    gridActor.getProperty().setRepresentation(1); // mode filaire
-    gridActor.getProperty().setColor(0.7, 0.7, 0.7); // gris clair
-
-    renderer.addActor(gridActor);
+    renderer.addActor(cubeAxes);
   }
 
   

@@ -1,34 +1,39 @@
 <script setup>
 import { ref, onMounted, render } from 'vue'
 import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
-import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
+
 import vtkOrientationMarkerWidget from '@kitware/vtk.js/Interaction/Widgets/OrientationMarkerWidget';
+import vtkVectorText from '@kitware/vtk.js/Rendering/Core/VectorText';
+import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
+
 import vtkImageData from "@kitware/vtk.js/Common/DataModel/ImageData";
 import vtkDataArray from "@kitware/vtk.js/Common/Core/DataArray";
-import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
-import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper';
 import vtkVolume from '@kitware/vtk.js/Rendering/Core/Volume';
-import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor';
-import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
-import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
-import vtkCubeSource from '@kitware/vtk.js/Filters/Sources/CubeSource';
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkPoints from '@kitware/vtk.js/Common/Core/Points';
-import vtkCellArray from '@kitware/vtk.js/Common/Core/CellArray';
-import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper';
-import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
-import vtkImageMapper from '@kitware/vtk.js/Rendering/Core/ImageMapper';
-import vtkImageSlice from '@kitware/vtk.js/Rendering/Core/ImageSlice';
-import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
-import vtkPlaneSource from '@kitware/vtk.js/Filters/Sources/PlaneSource';
-import vtkWarpScalar from '@kitware/vtk.js/Filters/General/WarpScalar';
-import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
-import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
-import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor';
+import vtkCellArray from '@kitware/vtk.js/Common/Core/CellArray'
 
+import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
+import vtkCubeAxesActor from '@kitware/vtk.js/Rendering/Core/CubeAxesActor';
+import vtkScalarBarActor from '@kitware/vtk.js/Rendering/Core/ScalarBarActor';
+import vtkAxesActor from '@kitware/vtk.js/Rendering/Core/AxesActor';
+
+import vtkVolumeMapper from '@kitware/vtk.js/Rendering/Core/VolumeMapper';
+import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
+import vtkGlyph3DMapper from '@kitware/vtk.js/Rendering/Core/Glyph3DMapper';
+
+import vtkPlaneSource from '@kitware/vtk.js/Filters/Sources/PlaneSource';
+import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
+
+import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
+import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
+
+import opentype from 'opentype.js';
 import * as d3scale from 'd3-scale';
 import * as d3array from 'd3-array';
 
+
+// .json obtenu du back
 const props_from_parent = defineProps({
   jsonContent: {
     type: Object,
@@ -77,7 +82,7 @@ onMounted(() => {
   if (scene.grid) {
     const { dimensions, origin, spacing, cell_data } = scene.grid;
 
-    // --- Correction des dimensions pour rester cohérent
+    // Correction des dimensions pour rester cohérent
     dimensions[0] -= 1;
     dimensions[1] -= 1;
     dimensions[2] -= 1;
@@ -88,21 +93,21 @@ onMounted(() => {
 
     // --- Associer les scalaires
     if (cell_data.values) {
-      // --- Min/Max pour les différentes calculs et pour bien spécifier les intervalles d'intérêts
+      // Min/Max pour les différentes calculs et pour bien spécifier les intervalles d'intérêts
       const origValues = cell_data.values;
       const dataMin = Math.min(...origValues);
       const dataMax = Math.max(...origValues);
 
-      // --- Choix d'une valeur sentinel en dehors de l'intervalle réel (0..5)
+      // Choix d'une valeur sentinel en dehors de l'intervalle réel (0..5)
       const MASK = -9999;
 
-      // --- Construction du tableau "masked" : si site==1 => MASK (masqué), sinon garder la valeur
+      // Construction du tableau "masked" : si site==1 => MASK (masqué), sinon garder la valeur
       const maskedValues = new Float32Array(origValues.length);
       for (let i = 0; i < origValues.length; i++) {
         maskedValues[i] = (cell_data.site[i] === 1) ? MASK : origValues[i];
       }
 
-      // --- Création du vtkDataArray à partir de maskedValues (on garde le nom "values")
+      // Création du vtkDataArray à partir de maskedValues (on garde le nom "values")
       const scalars = vtkDataArray.newInstance({
         name: "values",
         numberOfComponents: 1,
@@ -110,18 +115,18 @@ onMounted(() => {
       });
       imageData.getPointData().setScalars(scalars);
 
-      // --- Couleur : définir la colorFunction uniquement sur dataMin..dataMax
+      // Couleur : définir la colorFunction uniquement sur dataMin..dataMax
       const colorFunction = vtkColorTransferFunction.newInstance();
       colorFunction.addRGBPoint(dataMin, 0, 0, 1);
       colorFunction.addRGBPoint(dataMax, 1, 0, 1);
 
-      // --- Opacité : MASK -> 0 (invisible), tout le reste entre dataMin..dataMax -> 1 (visible)
+      // Opacité : MASK -> 0 (invisible), tout le reste entre dataMin..dataMax -> 1 (visible)
       const opacityFunction = vtkPiecewiseFunction.newInstance();
       opacityFunction.addPoint(MASK, 0);       // toutes les cellules masquées => totalement transparentes
       opacityFunction.addPoint(dataMin, 1);    // bornes visibles
       opacityFunction.addPoint(dataMax, 1);
 
-      // --- Mapper couleur / opacité
+      // Mapper couleur / opacité
       const volumeMapper = vtkVolumeMapper.newInstance();
       volumeMapper.setInputData(imageData);
 
@@ -134,7 +139,7 @@ onMounted(() => {
 
       renderer.addVolume(volume);
 
-      // --- Barre scalaire
+      // Barre scalaire
       const scalarBarActor = vtkScalarBarActor.newInstance();
       scalarBarActor.setScalarsToColors(colorFunction);
       scalarBarActor.setAxisLabel('G_values');
@@ -146,7 +151,7 @@ onMounted(() => {
       renderer.addActor(scalarBarActor);
     }
 
-    // --- QUADRILLAGE sur le modèle 
+    // QUADRILLAGE sur le modèle 
     const bounds = imageData.getBounds();
     const cubeAxes = vtkCubeAxesActor.newInstance();
     cubeAxes.setDataBounds(bounds);
@@ -179,16 +184,17 @@ onMounted(() => {
   // ------------- Pour l'ajout des points en surface
   if (scene.points_surface) {
     const surfacePoints = scene.points_surface.points;
+    const pointNames = scene.points_surface.data_points.nom; 
 
     if (surfacePoints.length > 0) {
-      // --- Ajout des points
+      // Ajout des points
       const points = vtkPoints.newInstance();
       surfacePoints.forEach((p) => points.insertNextPoint(...p));
 
       const polyData = vtkPolyData.newInstance();
       polyData.setPoints(points);
 
-      // --- Ajout d'un CellArray pour garantir l'affichage
+      // Ajout d'un CellArray pour garantir l'affichage
       const vertices = vtkCellArray.newInstance({
         values: new Uint32Array(surfacePoints.length * 2),
       });
@@ -198,14 +204,14 @@ onMounted(() => {
       }
       polyData.setVerts(vertices);
 
-      // --- Définition de la taille des points
+      // Définition de la taille des points
       const sphereSource = vtkSphereSource.newInstance({
         radius: 5,
         thetaResolution: 16,
         phiResolution: 16,
       });
 
-      // --- Visualisation des points
+      // Ajout des points
       const glyphMapper = vtkGlyph3DMapper.newInstance();
       glyphMapper.setInputData(polyData);
       glyphMapper.setSourceConnection(sphereSource.getOutputPort());
@@ -213,9 +219,44 @@ onMounted(() => {
       const glyphActor = vtkActor.newInstance();
       glyphActor.setMapper(glyphMapper);
       glyphActor.getProperty().setColor(0, 0, 0);
-      glyphActor.getProperty().setPointSize(15)
+      glyphActor.getProperty().setPointSize(15);
       glyphActor.getProperty().setOpacity(1.0);
       renderer.addActor(glyphActor);
+
+      // --- Ajout des labels avec vtkVectorText
+      import( // module qui permet de modéliser les mots
+        /* webpackIgnore: true */ 'https://unpkg.com/earcut@3.0.1/src/earcut.js'
+      ).then((earcutModule) => {
+        window.earcut = earcutModule.default;
+        opentype.load('police_grid/Bullpen3D.ttf', function(err, font) { // On ouvre le fichier .ttf ou .otf présent dans public qui définit la police d'écriture des noms
+        if (err) {
+          console.error('Erreur chargement font', err);
+          return;
+        }
+
+        // Création des différents objets "nom"
+        surfacePoints.forEach((point, i) => {
+          const [x, y, z] = point;
+
+          const vectorText = vtkVectorText.newInstance({earcut: earcutModule.default});
+          vectorText.setText(pointNames[i]);
+          vectorText.setFont(font); 
+
+          const textMapper = vtkMapper.newInstance();
+          textMapper.setInputConnection(vectorText.getOutputPort());
+
+          const textActor = vtkActor.newInstance();
+          textActor.setMapper(textMapper);
+          textActor.getProperty().setColor(1, 0, 0);
+          textActor.setPosition(x, y, z - 0.1);
+          textActor.setScale(0.08, 0.08, 0.1);
+
+          renderer.addActor(textActor);
+        });
+      });
+    });
+
+      console.log('Points et labels ajoutés avec vtkVectorText');
     }
   }
 
@@ -223,17 +264,16 @@ onMounted(() => {
   if (scene.points_profondeurs) {
     const profPoints = scene.points_profondeurs.points;
     const pointsValeurs = scene.points_profondeurs.data_points
-    // const pointsValeurs = [93.42, 88.68, 88.68, 89.68, 94.07, 93.42, 88.68, 89.68, 94.07, 92.17, 89.165, 89.165, 87.516, 87.516, 94.61, 94.61, 95.924, 95.924, 89.293, 89.293, 85.617, 85.617, 83.186, 83.186, 86.398,86.398, 99.957, 99.957, 98.413, 93.308, 82.394, 82.394, 83.971, 90.116, 90.116, 80.602, 80.602]
     
     if (profPoints.length > 0) {
-      // --- Ajout des points
+      // Ajout des points
       const points = vtkPoints.newInstance();
       profPoints.forEach((p) => points.insertNextPoint(...p));
       
       const polyData = vtkPolyData.newInstance();
       polyData.setPoints(points);
 
-      // --- Ajout d'un CellArray pour garantir l'affichage
+      // Ajout d'un CellArray pour garantir l'affichage
       const vertices = vtkCellArray.newInstance({
         values: new Uint32Array(profPoints.length * 2),
       });
@@ -243,7 +283,7 @@ onMounted(() => {
       }
       polyData.setVerts(vertices);
 
-      // --- Scalaire et gestion de la couleur des points
+      // Scalaire et gestion de la couleur des points
       const scalars = vtkDataArray.newInstance({
         name: 'valeurs',
         numberOfComponents: 1,
@@ -259,14 +299,14 @@ onMounted(() => {
       colorFunction.addRGBPoint(minVal, 0, 0, 1);   
       colorFunction.addRGBPoint(maxVal, 1, 0, 1);   
 
-      // --- Taille des points
+      // Taille des points
       const sphereSource = vtkSphereSource.newInstance({
         radius: 5,
         thetaResolution: 16,
         phiResolution: 16,
       });
 
-      // --- Visualisation des points 
+      // Visualisation des points 
       const glyphMapper = vtkGlyph3DMapper.newInstance();
       glyphMapper.setInputData(polyData);
       glyphMapper.setSourceConnection(sphereSource.getOutputPort());
@@ -281,7 +321,7 @@ onMounted(() => {
       glyphActor.getProperty().setOpacity(1.0);
       renderer.addActor(glyphActor);
 
-      // --- Visualisation de la barre scalaire
+      // Visualisation de la barre scalaire
       const scalarBarActor = vtkScalarBarActor.newInstance();
       scalarBarActor.setScalarsToColors(colorFunction);
       scalarBarActor.setAxisLabel('P_values');
@@ -306,7 +346,7 @@ onMounted(() => {
       const texture = vtkTexture.newInstance();
       texture.setImage(image);
 
-      // --- Construire un vtkImageData pour récupérer les bounds
+      // Construire un vtkImageData pour récupérer les bounds
       const imageData = vtkImageData.newInstance();
       imageData.setDimensions(...scene.grid.dimensions);
       imageData.setOrigin(...scene.grid.origin);
@@ -317,7 +357,7 @@ onMounted(() => {
       const z_top = zmin - z_offset;
 
       console.log("2D",xmax, xmin)
-      // --- Plan collé exactement au dessus de la grille
+      // Plan collé exactement au dessus de la grille
       const plane = vtkPlaneSource.newInstance({
         origin: [xmax, ymin, z_top],   // bas-droit
         point1: [xmin, ymin, z_top],   // bas-gauche
@@ -338,11 +378,12 @@ onMounted(() => {
     };
   }
 
+// ------------- Pour l'ajout d'une surface 3D sur la grille prenant en compte la topo
   if (scene.topographie && scene.texture3D) {
-    const topoBytes = scene.topographie.data;  // tableau d’octets CSV
-    const textureData = scene.texture3D;       // { data: base64, type: 'image/png' }
+    const topoBytes = scene.topographie.data; 
+    const textureData = scene.texture3D;       
 
-    // --- Convertion du tableau d'octets en texte CSV
+    // Convertion du tableau d'octets en texte CSV
     const csvText = new TextDecoder().decode(new Uint8Array(topoBytes));
     const lines = csvText.split(/\r?\n/).filter((l) => l.trim() !== '');
     const topoPoints = lines.slice(1).map((line) => {
@@ -350,13 +391,13 @@ onMounted(() => {
       return { x, y, z };
     });
 
-    // --- Extraction des valeurs uniques pour la grille
+    // Extraction des valeurs uniques pour la grille
     const xUnique = [...new Set(topoPoints.map(p => p.x))].sort((a, b) => a - b);
     const yUnique = [...new Set(topoPoints.map(p => p.y))].sort((a, b) => a - b);
     const nx = xUnique.length;
     const ny = yUnique.length;
 
-    // --- Valeurs Z par point
+    // Valeurs Z par point
     const pointValues = new Float32Array(nx * ny);
     topoPoints.forEach((p) => {
       const i = xUnique.indexOf(p.x);
@@ -364,7 +405,7 @@ onMounted(() => {
       pointValues[i + j * nx] = -p.z; // inverser Z si nécessaire
     });
 
-    // --- Détermination des limites de la grille
+    // Détermination des limites de la grille
     const imageData = vtkImageData.newInstance();
     imageData.setDimensions(...scene.grid.dimensions);
     imageData.setOrigin(...scene.grid.origin);
@@ -372,7 +413,7 @@ onMounted(() => {
 
     const [xmin, xmax, ymin, ymax, zmin, zmax] = imageData.getBounds();
 
-    // --- Création du plan aligné sur les bounds
+    // Création du plan aligné sur les bounds
     const plane = vtkPlaneSource.newInstance({
       origin: [xmax, ymin, 0],   // bas-droit
       point1: [xmin, ymin, 0],   // bas-gauche
@@ -381,7 +422,7 @@ onMounted(() => {
       yResolution: ny - 1,
     });
 
-    // --- Application les valeurs Z sur les points
+    // Application les valeurs Z sur les points
     const planePolyData = plane.getOutputData();
     const planePoints = planePolyData.getPoints().getData();
 
@@ -392,7 +433,7 @@ onMounted(() => {
       }
     }
 
-    // --- Création de la texture
+    // Création de la texture
     const img = new Image();
     img.src = `data:${textureData.type};base64,${textureData.data}`;
     img.onload = () => {
@@ -411,6 +452,7 @@ onMounted(() => {
     };
   }
 
+  // --- Affichage du tout, on reset la camera pour bien avoir toute la scène, et on repositionne la caméra
   renderer.resetCamera();
   const camera = renderer.getActiveCamera();
   const fp = camera.getFocalPoint();

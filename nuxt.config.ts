@@ -39,7 +39,7 @@ export default defineNuxtConfig({
     },
   },
   // modules: ["vuetify-nuxt-module", "@pinia/nuxt", "@nuxt/image"],
-  modules: ["vuetify-nuxt-module", '@sidebase/nuxt-auth', "@pinia/nuxt", "@nuxt/image", "nuxt-plotly", "xlsx"],
+  modules: ["vuetify-nuxt-module", '@sidebase/nuxt-auth', "@pinia/nuxt", "@nuxt/image", "nuxt-plotly"],
   // modules: ["vuetify-nuxt-module", '@sidebase/nuxt-auth'],
   auth: {
     isEnabled: true,

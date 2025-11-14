@@ -6,12 +6,12 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  nitro: {
-    preset: 'cloudflare-module',
-    replace: {
-      'typeof window': '`undefined`',
-    },
-  },
+  // nitro: {
+  //   preset: 'cloudflare-module',
+  //   replace: {
+  //     'typeof window': '`undefined`',
+  //   },
+  // },
   vuetify: {
     vuetifyOptions: {
       theme: {

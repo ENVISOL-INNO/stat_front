@@ -22,8 +22,7 @@
     "pinia": "^2.2.6",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
-    "vuetify-nuxt-module": "^0.14.0",
-    "xlsx": "0.18.5"
+    "vuetify-nuxt-module": "^0.14.0"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.12.3",

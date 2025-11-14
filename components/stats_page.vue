@@ -42,7 +42,12 @@
   </div>
   <!-- <div v-if="storeNav.show_freq_cum && mode == 'spectro'">
     <FormulaireGeneralise name="visualisation grid" endpoint_name="/VisGrid" :champs=list_champ_visgrid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
-  </div> -->
+  </div>
+   <-- SWAG API -->
+  <div v-if="storeNav.show_modelling">
+    <FormulaireGeneralise name="Modélisation" endpoint_name="/ModelisationAuto" :champs=list_champ_Modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -53,11 +58,9 @@ import Formulaire_stats_de_base from '~/components/formulaire_stats_de_base.vue'
 import File_import from '~/components/file_import.vue';
 import type { Champ } from './formulaire_generalise.vue';
 
-
 const mode = useRuntimeConfig().public.mode;
 const store = useMyData_and_resultsStore();
 const storeNav = useMyNavStore();
-
 
 const list_champ_histo : Ref<Array<Champ>> = ref([
   {label: "Élément à analyser", name: "nom_elem", type_of_params: "col", value: ""},
@@ -83,4 +86,18 @@ const list_champ_boxplot : Ref<Array<Champ>> = ref([
 const list_champ_visgrid : Ref<Array<Champ>> = ref([
   {label: "Taille d'une cellule séparées par un espace ", name: "spacing", type_of_params: "num_list", value: ""},
 ])
+
+// --- SWAG API ---
+
+const list_champ_Modelling : Ref<Array<Champ>> = ref([
+  {label: "Forages : Nom | x | y | z | valeur_1... | ... | valeur_n...", name: "drills", type_of_params: "col"     , value: ""},
+  {label: "Polygone : x | y | z "                      , name: "polygon"               , type_of_params: "col"     , value: ""},
+  {label: "Code EPSG"                                  , name: "inproj"                , type_of_params: "num"     , value: 0}
+  {label: "Orientation Z"                              , name: "depth_in"              , type_of_params: "string"  , value: "above_sea_level"}
+  {label: "Grille : Zmin | Zmax"                       , name: "grid_zmin_zmax"        , type_of_params: "num_list", value: [-999, -999]},
+  {label: "Grille : dX | dY | dZ"                      , name: "grid_steps"            , type_of_params: "num_list", value: [0, 0, 0]},
+  {label: "Modélisation : Paramètre de forage modélisé", name: "model_parameter"       , type_of_params: "string"  , value: ""}
+  {label: "Modelisation : Valeur seuil"                , name: "model_threshold"       , type_of_params: "num"     , value: 0}
+])
+       
 </script>

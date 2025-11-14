@@ -16,14 +16,14 @@
     "@pinia/nuxt": "^0.7.0",
     "dotenv": "^8.2.0",
     "next-auth": "~4.21.1",
-    "nuxt": "^3.13.2",
+    "nuxt": "^3.17.7",
     "nuxt-plotly": "^1.0.14",
     "papaparse": "^5.4.1",
     "pinia": "^2.2.6",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "vuetify-nuxt-module": "^0.14.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "0.18.5"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.12.3",

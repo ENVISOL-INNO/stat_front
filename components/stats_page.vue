@@ -40,9 +40,9 @@
   <div v-if="storeNav.show_hist">
     <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
-  <div v-if="storeNav.show_freq_cum && mode == 'spectro'">
+  <!-- <div v-if="storeNav.show_freq_cum && mode == 'spectro'">
     <FormulaireGeneralise name="visualisation grid" endpoint_name="/VisGrid" :champs=list_champ_visgrid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
-  </div>
+  </div> -->
 </template>
 
 <script setup lang="ts">

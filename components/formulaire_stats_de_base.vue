@@ -76,7 +76,6 @@ async function post_stats_de_base() {
  */
  function downloadBlob() {
   // fixed content for now
-  const content = arrayToCsv(json_table_basic_stats.value)
   // create json object from json_table_basic_stats.value with keys from json_colonnes_dict.value
   const json_basic_stats = json_table_basic_stats.value.map((item) => {
     const newItem = {};
@@ -85,7 +84,8 @@ async function post_stats_de_base() {
     });
     return newItem;
   });
-
+  const content = arrayToCsv(json_basic_stats);
+  
   // fixed filename for now
   const filename = 'export_statistiques_de_base.csv'
 

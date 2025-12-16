@@ -38,9 +38,7 @@ export default defineNuxtConfig({
       include: ["plotly.js-dist-min"],
     },
   },
-  // modules: ["vuetify-nuxt-module", "@pinia/nuxt", "@nuxt/image"],
   modules: ["vuetify-nuxt-module", '@sidebase/nuxt-auth', "@pinia/nuxt", "@nuxt/image", "nuxt-plotly"],
-  // modules: ["vuetify-nuxt-module", '@sidebase/nuxt-auth'],
   auth: {
     isEnabled: true,
     // disableServerSideAuth: false,

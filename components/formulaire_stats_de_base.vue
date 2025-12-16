@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import * as PaPa from 'papaparse';
-import * as xlsx from 'xlsx';
+// import * as xlsx from 'xlsx';
 // import * as fs from 'fs';
 
 const runtimeConfig = useRuntimeConfig()
@@ -69,14 +69,14 @@ async function post_stats_de_base() {
 };
 
 
+
 /**
  * Download contents as a file
  * Source: https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
  */
  function downloadBlob() {
   // fixed content for now
-  // const content = arrayToCsv(json_table_basic_stats.value)
-
+  const content = arrayToCsv(json_table_basic_stats.value)
   // create json object from json_table_basic_stats.value with keys from json_colonnes_dict.value
   const json_basic_stats = json_table_basic_stats.value.map((item) => {
     const newItem = {};
@@ -86,18 +86,11 @@ async function post_stats_de_base() {
     return newItem;
   });
 
-  const content = convertToXlsxCsv(json_basic_stats)
-  
   // fixed filename for now
-  // const filename = 'export_statistiques_de_base.csv'
-  const filename = 'export_statistiques_de_base.xlsx'
+  const filename = 'export_statistiques_de_base.csv'
 
   // Fixed content type for now
-  // const contentType = 'text/csv;charset=utf-8;'
-  // contentType to save in xlsx
-  const contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-
-  // const contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
+  const contentType = 'text/csv;charset=utf-8;'
 
   // Create a blob
   var blob = new Blob([content], { type: contentType });
@@ -109,16 +102,6 @@ async function post_stats_de_base() {
   pom.setAttribute('download', filename);
   pom.click();
 };
-
-
-// convert data to a xlsx blob
-function convertToXlsxCsv(data) {
-  const workbook = xlsx.utils.book_new();
-  const worksheet = xlsx.utils.json_to_sheet(data);
-  xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
-  const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-  return buffer;
-}
 
 
 /**
@@ -138,26 +121,8 @@ function convertToXlsxCsv(data) {
   // ).join('\r\n');  // rows starting on new lines
 }
 
-// const convertToXlsxCsv = (jsonData: any[]) => {
-//   // Create a new workbook
-//   const workbook = xlsx.utils.book_new();
 
-//   // Add the JSON data to a new sheet
-//   const sheet = xlsx.utils.json_to_sheet(jsonData);
 
-//   // Add the sheet to the workbook
-//   xlsx.utils.book_append_sheet(workbook, sheet, 'Sheet 1');
-
-//   // Write the workbook to a file
-//   if (fileType === 'xlsx') {
-//     xlsx.writeFile(workbook, outputFilePath);
-//   } else if (fileType === 'csv') {
-//     const csvData = xlsx.utils.sheet_to_csv(sheet);
-//     fs.writeFileSync(outputFilePath, csvData);
-//   }
-
-//   console.log(`Conversion from JSON to ${fileType.toUpperCase()} successful!`);
-// };
 
 
 

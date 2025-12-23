@@ -91,9 +91,10 @@ async function post_stats_de_base() {
 
   // Fixed content type for now
   const contentType = 'text/csv;charset=utf-8;'
-
+  var BOM = "\uFEFF";                               // this tells excel to read é è à characters correctly
+  var csvContent = BOM + content;
   // Create a blob
-  var blob = new Blob([content], { type: contentType });
+  var blob = new Blob([csvContent], { type: contentType });
   var url = URL.createObjectURL(blob);
 
   // Create a link to download it

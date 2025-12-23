@@ -121,9 +121,4 @@ async function post_stats_de_base() {
   // ).join('\r\n');  // rows starting on new lines
 }
 
-
-
-
-
-
 </script>

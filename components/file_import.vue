@@ -39,8 +39,8 @@ watch(files, Read_File);
 
 
 async function Read_File() {
-  const csv_file = files.value[0];
-  console.log("file", csv_file);
+  const csv_file = files.value;
+  console.log("file in file_import", csv_file);
   let reader = new FileReader();
   reader.readAsText(csv_file);
   reader.onload = async () => {

@@ -17,6 +17,8 @@
 
 <script setup lang="ts">
 import * as PaPa from 'papaparse';
+// import * as xlsx from 'xlsx';
+// import * as fs from 'fs';
 
 const runtimeConfig = useRuntimeConfig()
 const bck_end_base_url_ = runtimeConfig.public.backend_url_public;
@@ -39,16 +41,21 @@ let props_from_parent = defineProps({
 
 let headers_from_back = ref([]);
 let json_table_basic_stats = ref([]);
+let json_colonnes_dict = ref([]);
 
 async function post_stats_de_base() {
   const { data: res, status } = await useFetch(bck_end_base_url_+'/BasicStatistics', {
     method: 'POST',
     body: {"dataframe": props_from_parent.data},
+    onRequest({ request, options }) {
+        console.log("props_from_parent.data", props_from_parent.data);
+    },
     onResponse({ request, response, options }) {
       console.log("response._data", response._data);
       let colonnes_dict = response._data["colonnes_dict"];
-      console.log("colonnes_dict", colonnes_dict)
-      colonnes_dict = colonnes_dict.sort((a: { pos: number; }, b: { pos: number; }) => {return a.pos - b.pos})
+      console.log("colonnes_dict", colonnes_dict);
+      colonnes_dict = colonnes_dict.sort((a: { pos: number; }, b: { pos: number; }) => {return a.pos - b.pos});
+      json_colonnes_dict.value = colonnes_dict;
       headers_from_back.value = colonnes_dict.map(({nv_nom, nom}) => {return {title: nv_nom, value: nom}});
       console.log("headers_from_back", headers_from_back);
       json_table_basic_stats.value = response._data["list_stats"]
@@ -68,16 +75,27 @@ async function post_stats_de_base() {
  */
  function downloadBlob() {
   // fixed content for now
-  const content = arrayToCsv(json_table_basic_stats.value)
+  // create json object from json_table_basic_stats.value with keys from json_colonnes_dict.value
+  const json_basic_stats = json_table_basic_stats.value.map((item) => {
+    const newItem = {};
+    json_colonnes_dict.value.forEach((col) => {
+      newItem[col.nv_nom] = item[col.nom];
+    });
+    return newItem;
+  });
+  // order 
 
+  const content = arrayToCsv(json_basic_stats);
+  
   // fixed filename for now
   const filename = 'export_statistiques_de_base.csv'
 
   // Fixed content type for now
   const contentType = 'text/csv;charset=utf-8;'
-
+  var BOM = "\uFEFF";                               // this tells excel to read é è à characters correctly
+  var csvContent = BOM + content;
   // Create a blob
-  var blob = new Blob([content], { type: contentType });
+  var blob = new Blob([csvContent], { type: contentType });
   var url = URL.createObjectURL(blob);
 
   // Create a link to download it
@@ -104,6 +122,5 @@ async function post_stats_de_base() {
   //   .join(',')  // comma-separated
   // ).join('\r\n');  // rows starting on new lines
 }
-
 
 </script>

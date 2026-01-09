@@ -84,6 +84,8 @@ async function post_stats_de_base() {
     });
     return newItem;
   });
+  // order 
+
   const content = arrayToCsv(json_basic_stats);
   
   // fixed filename for now

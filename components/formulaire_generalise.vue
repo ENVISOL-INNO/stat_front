@@ -67,6 +67,10 @@ let props_from_parent = defineProps({
         type: String,
         required: true,
   },
+  backend: {
+        type: String,
+        required: true,
+  },
   champs: {
         type: Array<Champ>,
         required: true,
@@ -106,8 +110,9 @@ for (let i =0; i < props_from_parent.champs.length; i++) {
 
 // Post
 const runtimeConfig = useRuntimeConfig();
-const bck_end_base_url_ = runtimeConfig.public.backend_url_public;
-
+const bck_end_base_url_ = props_from_parent.backend == "" ? runtimeConfig.public.backend_url_public : props_from_parent.backend;
+console.log("bck_end_base_url_", bck_end_base_url_)
+console.log("bck_end_base_url_", props_from_parent.backend == "")
 const status_post = ref("");
 
 const res_from_post : Ref<string> = ref(init_form.result);    // TODO should accept other types of results

@@ -23,13 +23,13 @@
     </div>
   </div>
   <v-btn color="primary" @click="post_form">Go</v-btn>
-  {{status_post}}
+  <!-- {{status_post}} -->
   <div v-if="status_post == 'pending'">
-    brrrr
-    <!-- <v-progress-circular v-if="status_post == 'pending'"
+    <!-- brrrr -->
+    <v-progress-circular v-if="status_post == 'pending'"
     color="green"
     indeterminate
-  ></v-progress-circular> -->
+  ></v-progress-circular>
   </div>
   <div v-if="status_post == 'error'">
     Erreur !

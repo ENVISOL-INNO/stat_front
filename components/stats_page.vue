@@ -29,23 +29,23 @@
   </div> -->
 
   <div v-if="storeNav.show_swarmplot">
-    <FormulaireGeneralise name="Swarmplot" endpoint_name="/EDASwarmPlot" :champs=list_champ_swarmplot store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireGeneralise name="Swarmplot" backend="" endpoint_name="/EDASwarmPlot" :champs=list_champ_swarmplot store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
   <div v-if="storeNav.show_boxplot">
-    <FormulaireGeneralise name="Boxplot" endpoint_name="/EDABoxPlot" :champs=list_champ_boxplot store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireGeneralise name="Boxplot" backend="" endpoint_name="/EDABoxPlot" :champs=list_champ_boxplot store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
   <div v-if="storeNav.show_freq_cum">
-    <FormulaireGeneralise name="Fréquences cumulées" endpoint_name="/FreqCum" :champs=list_champ_freq_cum store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireGeneralise name="Fréquences cumulées" backend="" endpoint_name="/FreqCum" :champs=list_champ_freq_cum store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
   <div v-if="storeNav.show_hist">
-    <FormulaireGeneralise name="Histogramme" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireGeneralise name="Histogramme" backend="" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
   <!-- <div v-if="storeNav.show_freq_cum && mode == 'spectro'">
     <FormulaireGeneralise name="visualisation grid" endpoint_name="/VisGrid" :champs=list_champ_visgrid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
    <-- SWAG API -->
-  <div v-if="storeNav.show_modelling && mode == 'spectro'">
-    <FormulaireGeneralise name="Modélisation" endpoint_name="/ModelisationAuto" :champs=list_champ_Modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  <div v-if="storeNav.show_modelling && mode == 'spectro' && mode == 'spectro'">
+    <FormulaireGeneralise name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto" :champs=list_champ_Modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
 
 </template>
@@ -61,6 +61,8 @@ import type { Champ } from './formulaire_generalise.vue';
 const mode = useRuntimeConfig().public.mode;
 const store = useMyData_and_resultsStore();
 const storeNav = useMyNavStore();
+const backeng_url_swag = useRuntimeConfig().public.backend_swag_url_public;
+
 
 const list_champ_histo : Ref<Array<Champ>> = ref([
   {label: "Élément à analyser", name: "nom_elem", type_of_params: "col", value: ""},

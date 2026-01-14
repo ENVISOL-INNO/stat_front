@@ -117,6 +117,23 @@ const status_post = ref("");
 
 const res_from_post : Ref<string> = ref(init_form.result);    // TODO should accept other types of results
 
+function deal_with_response(res: any) {
+  console.log(res)
+  console.log(typeof(res))
+  if ( res['fig'] !== undefined ) {
+    console.log("yooo")
+    return res['fig']
+  }
+  else if (res['modelisation'] !== undefined) {
+    console.log("iiiiiiiii")
+    console.log(res['modelisation'])
+  }
+  else {
+    console.log("jhsdssfskj")
+  }
+}
+
+
 async function post_form() {
 
   var body_json: {[id : string]: unknown} = {}
@@ -150,7 +167,9 @@ async function post_form() {
     },
     onResponse({ request, response, options }) {
       console.log("response._data", response._data);
-      res_from_post.value = response._data["fig"];    // TODO: this should also work when the endpoint does not return a fig
+      
+      res_from_post.value = deal_with_response(response._data);    // TODO: this should also work when the endpoint does not return a fig
+      
       const res = new Resultat(
         props_from_parent.endpoint_name,
         body_params_only,

@@ -92,11 +92,12 @@ const list_champ_visgrid : Ref<Array<Champ>> = ref([
 // --- SWAG API ---
 
 const list_champ_Modelling : Ref<Array<Champ>> = ref([
-  {label: "Polygone : x | y | z "            , name: "polygon"               , type_of_params: "string"  , value: ""},
-  {label: "Code EPSG"                        , name: "inproj"                , type_of_params: "num"     , value: 0},
+  {label: "colonne avec nom ech."            , name: "drillhole_col_name"    , type_of_params: "col"  , value: ""},
+  // {label: "Polygone : x | y | z "            , name: "polygon"               , type_of_params: "string"  , value: ""},
+  {label: "Code EPSG"                        , name: "inproj"                , type_of_params: "num"     , value: 2154},
   {label: "Orientation Z"                    , name: "depth_in"              , type_of_params: "string"  , value: "relative"},
-  {label: "Grille : Zmin, Zmax"              , name: "grid_zmin_zmax"        , type_of_params: "num_list", value: [0, 0]},
-  {label: "Grille : dim. X, dim. Y, dim. Z"  , name: "grid_steps"            , type_of_params: "num_list", value: [5, 5, 1]},
+  {label: "Grille : Zmin, Zmax"              , name: "grid_zmin_zmax"        , type_of_params: "num_list", value: "0 1"},
+  {label: "Grille : dim. X, dim. Y, dim. Z"  , name: "grid_steps"            , type_of_params: "num_list", value: "5 5 1"},
   {label: "Modélisation : Paramètre modélisé", name: "model_parameter"       , type_of_params: "col"     , value: ""},
   {label: "Modelisation : Valeur seuil"      , name: "model_threshold"       , type_of_params: "num"     , value: 0},
 ])

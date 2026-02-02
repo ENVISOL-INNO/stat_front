@@ -47,10 +47,18 @@
   <div v-if="storeNav.show_modelling && mode == 'spectro' && mode == 'spectro'">
     <FormulaireGeneralise name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto" :champs=list_champ_Modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
+  <div>
+    <!-- <DownloadBlobBtn :data="brr" é"filename="ff" /> -->
+
+  </div>
+
 
 </template>
 
 <script setup lang="ts">
+const strin_arr : string = '[{"z":3.5, "value":0.009058,"x":1.3373074042,"y":48.0687111932},{"z":4.5,"value":0.0,"x":1.3373074042,"y":48.0687111932},{"z":5.5,"value":0.0,"x":1.3373074042,"y":48.0687111932},{"z":6.5,"value":0.0,"x":1.3373074042,"y":48.0687111932},{"z":0.5,"value":0.206616,"x":1.337340469,"y":48.0685136444},{"z":1.5,"value":0.01,"x":1.337340469,"y":48.0685136444}]'
+// transform strin_arr into an array
+const brr : Array<string> = JSON.parse(strin_arr);
 
 import { useMyData_and_resultsStore } from '~/stores/data_and_results';
 import { useMyNavStore } from '~/stores/nav';

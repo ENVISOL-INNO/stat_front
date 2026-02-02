@@ -15,8 +15,8 @@ import { defineStore } from 'pinia'
 // based on this: https://medium.com/@perisicnikola37/dont-use-typescript-types-like-this-use-map-pattern-instead-bed75a0e986e
 // Here to add a type of parameter
 export type Parameter = {
-  type_of_params: "col" | "col_list" | "num" | "num_list" | "string"; // here: add text input
-  value: Array<string> | string | number | Array<number> ;
+  type_of_params: "col" | "col_list" | "num" | "num_list" | "string" | "file" ; // here: add text input
+  value: Array<string> | string | number | Array<number> | Array<File> ;
 }
 
 export type ParameterMap = Record<string, Parameter>

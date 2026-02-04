@@ -1,7 +1,6 @@
 <template>
   <div>
       <v-btn color="primary" @click="downloadBlob"> Enregistrer sous </v-btn>
-      hhh
   </div>
 </template>
 
@@ -25,7 +24,7 @@ let props_from_parent = defineProps({
 });
 
 console.log(27, "in blob")
- 
+
 /**
  * Download contents as a file
  * Source: https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
@@ -36,7 +35,7 @@ console.log(27, "in blob")
   console.log("content", content);
   // Fixed content type for now
   const contentType = 'text/csv;charset=utf-8;'
-  var BOM = "\uFEFF";                               // this tells excel to read é è à characters correctly
+  var BOM = "\uFEFF";                               // this tells excel to read accents characters correctly
   var csvContent = BOM + content;
   // Create a blob
   var blob = new Blob([csvContent], { type: contentType });

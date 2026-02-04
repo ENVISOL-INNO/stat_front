@@ -45,7 +45,13 @@
   </div>
    <-- SWAG API -->
   <div v-if="storeNav.show_modelling && mode == 'spectro' && mode == 'spectro'">
-    <FormulaireGeneralise name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto" :champs=list_champ_Modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireGeneralise name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto" :champs=list_champ_modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  </div>
+  <div v-if="storeNav.show_bm && mode == 'spectro' && mode == 'spectro'">
+    <FormulaireGeneralise name="Bilan massique" :backend=backeng_url_swag endpoint_name="/masse_volume_analysis_table" :champs=list_champ_bm store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+  </div>
+  <div v-if="storeNav.show_calc_vol && mode == 'spectro' && mode == 'spectro'">
+    <FormulaireGeneralise name="Calculs de volume" :backend=backeng_url_swag endpoint_name="/access_volume_analysis_table" :champs=list_champ_calc_vol store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
   <div>
     <!-- <DownloadBlobBtn :data="brr" é"filename="ff" /> -->
@@ -93,21 +99,39 @@ const list_champ_boxplot : Ref<Array<Champ>> = ref([
   {label: "Éléments dans la somme à analyser", name: "list_elements", type_of_params: "col_list", value: []},
   {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
 ])
-const list_champ_visgrid : Ref<Array<Champ>> = ref([
-  {label: "Taille d'une cellule séparées par un espace ", name: "spacing", type_of_params: "num_list", value: ""},
-])
+// const list_champ_visgrid : Ref<Array<Champ>> = ref([
+//   {label: "Taille d'une cellule séparées par un espace ", name: "spacing", type_of_params: "num_list", value: ""},
+// ])
 
 // --- SWAG API ---
 
-const list_champ_Modelling : Ref<Array<Champ>> = ref([
-  {label: "colonne avec nom ech."            , name: "drillhole_col_name"    , type_of_params: "col"  , value: ""},
+const list_champ_modelling : Ref<Array<Champ>> = ref([
   // {label: "Polygone : x | y | z "            , name: "polygon"               , type_of_params: "string"  , value: ""},
-  {label: "Code EPSG"                        , name: "inproj"                , type_of_params: "num"     , value: 2154},
-  {label: "Orientation Z"                    , name: "depth_in"              , type_of_params: "string"  , value: "relative"},
-  {label: "Grille : Zmin, Zmax"              , name: "grid_zmin_zmax"        , type_of_params: "num_list", value: "0 1"},
-  {label: "Grille : dim. X, dim. Y, dim. Z"  , name: "grid_steps"            , type_of_params: "num_list", value: "5 5 1"},
   {label: "Modélisation : Paramètre modélisé", name: "model_parameter"       , type_of_params: "col"     , value: ""},
   {label: "Modelisation : Valeur seuil"      , name: "model_threshold"       , type_of_params: "num"     , value: 0},
+  {label: "Grille : dim. X dim. Y dim. Z"    , name: "grid_steps"            , type_of_params: "num_list", value: "5 5 1"},
+  {label: "Grille : Zmin, Zmax"              , name: "grid_zmin_zmax"        , type_of_params: "num_list", value: "0 1"},
+  {label: "Orientation Z"                    , name: "depth_in"              , type_of_params: "string"  , value: "relative"},
+  {label: "Code EPSG"                        , name: "inproj"                , type_of_params: "num"     , value: 2154},
+  {label: "colonne avec nom ech."            , name: "drillhole_col_name"    , type_of_params: "col"  , value: ""},
 ])
-       
+
+const list_champ_bm : Ref<Array<Champ>> = ref([
+  // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
+  {label: "Grille : dim. X dim. Y dim. Z", name: "grid_steps", type_of_params: "num_list", value: "5 5 1"},
+  {label: "Paramètre modélisé", name: "sim_str_identifier", type_of_params: "col", value: ""},
+  {label: "Densité sol", name: "soil_density", type_of_params: "num", value: 1.8},
+  {label: "Concentrations séparées par un espace (ex. 0 200 1000) (si vide des valeurs automatiques seront déterminé)", name: "concentration_threshold_list_table", type_of_params: "num_list", value: ""},
+  {label: "Valeur de fond", name: "concentration_threshold_background", type_of_params: "num", value: 0.2},
+])
+
+const list_champ_calc_vol : Ref<Array<Champ>> = ref([
+  // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
+  {label: "Grille : dim. X dim. Y dim. Z", name: "grid_steps", type_of_params: "num_list", value: "5 5 1"},
+  {label: "Paramètre modélisé", name: "pollutants_names", type_of_params: "col_list", value: []},
+  {label: "Valeur min.", name: "pollutants_min_values", type_of_params: "num_list", value: "0"},
+  {label: "Valeur max.", name: "pollutants_max_values", type_of_params: "num_list", value: "999999999"},
+  {label: "Orientation Z", name: "mode_z", type_of_params: "string", value: "relativ"},
+])
+
 </script>

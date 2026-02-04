@@ -19,7 +19,12 @@
       <v-list-item>
         <v-switch v-model="storeNav.show_modelling" color="primary" label="Modélisation"></v-switch>
       </v-list-item>
-    </v-list>
+      <v-list-item>
+        <v-switch v-model="storeNav.show_bm" color="primary" label="Bilan massique"></v-switch>
+      </v-list-item>
+      <v-list-item>
+        <v-switch v-model="storeNav.show_calc_vol" color="primary" label="Calcul de volumes"></v-switch>
+      </v-list-item>    </v-list>
     <!-- <v-switch v-model="mode_spectro" color="primary" label="Spectro"></v-switch> -->
   </v-navigation-drawer>
 </template>

@@ -19,6 +19,9 @@
     <div v-else-if="array_of_champs[i-1][0].type_of_params == 'file'">
       <VFileInput v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></VFileInput>
     </div>
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'txt_list'">
+      <v-select v-model="array_of_champs[i-1][1].value" :items="champs[i-1].options" :label="champs[i-1].label"></v-select>
+    </div>
     <div v-else>
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!!!!!!!! ERREUR le champs marche pas !!!!!!!!!
@@ -60,7 +63,8 @@ import Chiplist from './chiplist.vue';
 
 export interface Champ extends Parameter {   // this looks a lot like a Parameter + a label, maybe change the type?
   label: string,
-  name: keyof ParameterMap
+  name: keyof ParameterMap,
+  options?: string[]
 }
 
 let props_from_parent = defineProps({

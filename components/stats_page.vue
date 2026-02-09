@@ -61,7 +61,6 @@
   <div v-if="storeNav.show_hist">
     <FormulaireGeneralise name="Histogramme" backend="" endpoint_name="/EDAHistogram" :champs=list_champ_histo store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
-
   <div v-if="storeNav.show_modelling && mode == 'spectro' && mode == 'spectro'">
     <FormulaireGeneralise name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto" :champs=list_champ_modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
   </div>
@@ -149,7 +148,7 @@ const list_champ_calc_vol : Ref<Array<Champ>> = ref([
   {label: "Paramètre modélisé", name: "pollutants_names", type_of_params: "col_list", value: []},
   {label: "Valeur min.", name: "pollutants_min_values", type_of_params: "num_list", value: "0"},
   {label: "Valeur max.", name: "pollutants_max_values", type_of_params: "num_list", value: "999999999"},
-  {label: "Z est exprimé en :", name: "mode_z", type_of_params: "string", value: "relativ"},
+  {label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"]},
 ])
 
 </script>

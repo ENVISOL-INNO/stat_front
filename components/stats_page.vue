@@ -7,12 +7,12 @@
         <v-expansion-panel-title><h2>Faire des stats</h2></v-expansion-panel-title>
         <v-expansion-panel-text>
           Le fichier attendu contient :<br>
-          - des colonne avec les noms, concentrations mesurées, lithologies (etc.) des échantillons<br>
+          - des colonnes avec les noms, concentrations mesurées, lithologies (etc.) des échantillons<br>
           - des lignes avec les échantillons<br><br>
           
           Il sera traité comme suit :<br>
           - les "nd", "<" sont transformés en 0<br>
-          - les "na" et "-" sont considérés comme non analysé<br>
+          - les "na" et "-" sont considérés comme non analysés<br>
           Tout autre texte ("non analysé" par exemple) n'est pas pris en compte et faussera les résultats !
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -106,6 +106,7 @@ const list_champ_swarmplot : Ref<Array<Champ>> = ref([
 const list_champ_boxplot : Ref<Array<Champ>> = ref([
   {label: "Somme à analyser", name: "sum_element", type_of_params: "col", value: ""},
   {label: "Éléments dans la somme à analyser", name: "list_elements", type_of_params: "col_list", value: []},
+  // {label: "Concentrations séparées par un espace (ex. 0 200 1000) (si vide des valeurs automatiques seront déterminé)", name: "concentration_threshold_list_table", type_of_params: "num_list", value: ""},
   {label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg"}
 ])
 // const list_champ_visgrid : Ref<Array<Champ>> = ref([

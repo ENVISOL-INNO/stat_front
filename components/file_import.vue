@@ -45,7 +45,7 @@ async function Read_File() {
   reader.readAsText(csv_file);
   reader.onload = async () => {
     const csv_string: string = reader.result as string;
-    const new_data_csv = PaPa.parse(csv_string, { delimiter: ";", header: true }).data;
+    const new_data_csv = PaPa.parse(csv_string, { delimiter: ";", header: true, skipEmptyLines: true }).data;
     store.set_data_csv(new_data_csv);
     const parser = PaPa.parse(csv_string, { delimiter: ";" });
     const new_colonnes = parser.data[0] as [string];

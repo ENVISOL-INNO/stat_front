@@ -16,6 +16,8 @@ export const useMyNavStore = defineStore({
       show_freq_cum: false,
       show_hist: false,
       show_modelling: false,
+      show_bm: false,
+      show_calc_vol: false,
     }
   },
   actions: {

@@ -16,6 +16,12 @@
     <div v-else-if="array_of_champs[i-1][0].type_of_params == 'string'">
       <v-text-field v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></v-text-field>
     </div>
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'file'">
+      <VFileInput v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></VFileInput>
+    </div>
+    <div v-else-if="array_of_champs[i-1][0].type_of_params == 'txt_list'">
+      <v-select v-model="array_of_champs[i-1][1].value" :items="champs[i-1].options" :label="champs[i-1].label"></v-select>
+    </div>
     <div v-else>
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!!!!!!!! ERREUR le champs marche pas !!!!!!!!!
@@ -29,29 +35,36 @@
     <v-progress-circular v-if="status_post == 'pending'"
     color="green"
     indeterminate
-  ></v-progress-circular>
+    ></v-progress-circular>
+  </div>
+  <div v-if="res_from_post != '' && status_post != 'pending' && bool_file_to_download">
+    <DownloadBlobBtn :data="file_to_download" :filename="filename" />
+    <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
   </div>
   <div v-if="status_post == 'error'">
     Erreur !
-    Ceci est probablement du a la présence de texte dans les colonnes sélectionnées. Vérifiez si elles sont inclues dans les alertes ci dessus et corrigez le fichier d'entré en conséquence.
+    Ceci est probablement du a la présence de texte dans les colonnes sélectionnées. Vérifiez si elles sont inclues dans les alertes ci dessus et corrigez le fichier d'entré en conséquence. L'autre problème potentiel est dans la saisie des données, vérifiez vos saisies.
   </div>
-
-  <div v-if="res_from_post != '' && status_post != 'pending'">
+  <div v-if="res_from_post != '' && status_post != 'pending' && bool_img">
     <NuxtImg v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
     <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
   </div>
+
 </template>
 
 <script lang="ts" setup>
 import { useMyData_and_resultsStore, useMySpectraStore, Resultat } from '~/stores/data_and_results';
 import type { ParameterMap, Parameter } from '~/stores/data_and_results';
+import * as PaPa from 'papaparse';
+
 import chiplist from './chiplist.vue';
 import Chiplist from './chiplist.vue';
 // import type { AllowedParameters, ParameterMap } from '~/stores/data_and_results';
 
 export interface Champ extends Parameter {   // this looks a lot like a Parameter + a label, maybe change the type?
   label: string,
-  name: keyof ParameterMap
+  name: keyof ParameterMap,
+  options?: string[]
 }
 
 let props_from_parent = defineProps({
@@ -95,7 +108,8 @@ const init_form = store.get_relevant_resultat(props_from_parent.endpoint_name, p
 const init_form_params = init_form.parameters;
 console.log("init_form_params", init_form_params)
 
-let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number | number[]>]>> = ref([])
+// TODO: make this type from Parameter value types
+let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number | number[] | File[]>]>> = ref([])
 
 
 // Prep the array of ref for the html template
@@ -117,6 +131,46 @@ const status_post = ref("");
 
 const res_from_post : Ref<string> = ref(init_form.result);    // TODO should accept other types of results
 
+
+let bool_img : Ref<boolean> = ref(false)
+let bool_file_to_download : Ref<boolean> = ref(false)
+let file_to_download : Ref<Array<string>> = ref([""])
+let filename : Ref<string> = ref("")
+let file_to_download_ = [""]
+
+function deal_with_response(res: any) {
+  console.log("res");
+  console.log(res);
+  console.log(res["df"]);
+  console.log(typeof(res));
+  if ( res['fig'] !== undefined ) {
+    console.log("yooo");
+    bool_img.value = true;
+    return res['fig']
+  }
+  else if (res['modelisation'] !== undefined) {
+    bool_file_to_download.value = true;
+    const string_array : string = res['modelisation']['kriging']['carto3D'];
+    const arrayyyy : Array<string> = JSON.parse(string_array);
+    file_to_download.value = arrayyyy;
+
+    filename.value = "modelisation"
+
+  }  else if (res['df'] !== undefined) {
+    bool_file_to_download.value = true;
+    const arrayyyy : Array<string> = res['df'];
+    file_to_download.value = arrayyyy;
+
+    filename.value = props_from_parent.name;
+    console.log(167)
+
+  }
+  else {
+    console.log("jhsdssfskj")
+  }
+}
+
+
 async function post_form() {
 
   var body_json: {[id : string]: unknown} = {}
@@ -134,6 +188,17 @@ async function post_form() {
       // console.log("heeee", list_str)
       body_json[array_of_champs.value[i][0].name] = list_str.map(s => Number(s))
       // console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
+    } else if (array_of_champs.value[i][0].type_of_params == "file") {
+      const csv_file = array_of_champs.value[i][1].value;
+      
+      let reader = new FileReader();
+
+      reader.readAsText(csv_file);
+      reader.onload = () => {
+        const csv_string: string = reader.result as string;
+        const new_data_csv = PaPa.parse(csv_string, { delimiter: ";", header: true, skipEmptyLines: true }).data;
+        body_json[array_of_champs.value[i][0].name] = new_data_csv
+      }
     } else {
       body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][1].value
     }
@@ -146,11 +211,14 @@ async function post_form() {
     method: 'POST',
     body: body_json,
     onRequest({}){
+      file_to_download.value = ['']
       status_post.value = "pending";
     },
     onResponse({ request, response, options }) {
       console.log("response._data", response._data);
-      res_from_post.value = response._data["fig"];    // TODO: this should also work when the endpoint does not return a fig
+      
+      res_from_post.value = deal_with_response(response._data);    // TODO: this should also work when the endpoint does not return a fig
+      
       const res = new Resultat(
         props_from_parent.endpoint_name,
         body_params_only,
@@ -174,14 +242,15 @@ async function post_form() {
   });
 };
 
-
-// clean up ofparams and results if new file is selected
+// clean up of params and results if new file is selected
 watch(() => store.data_csv, () => { reset_everything() });
 function reset_everything() {
   for (let i = 0; i < props_from_parent.champs.length; i++) {
     array_of_champs.value[i][1].value = props_from_parent.champs[i].value
   };
   res_from_post.value = ""
+  bool_file_to_download.value = false
+  bool_img.value = false
 }
 
 

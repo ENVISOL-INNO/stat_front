@@ -57,14 +57,11 @@ import { useMyData_and_resultsStore, useMySpectraStore, Resultat } from '~/store
 import type { ParameterMap, Parameter } from '~/stores/data_and_results';
 import * as PaPa from 'papaparse';
 
-import chiplist from './chiplist.vue';
-import Chiplist from './chiplist.vue';
-// import type { AllowedParameters, ParameterMap } from '~/stores/data_and_results';
-
 export interface Champ extends Parameter {   // this looks a lot like a Parameter + a label, maybe change the type?
   label: string,
   name: keyof ParameterMap,
-  options?: string[]
+  options?: string[],
+  processing?: Function
 }
 
 let props_from_parent = defineProps({
@@ -106,7 +103,7 @@ for (let i =0; i < props_from_parent.champs.length; i++) {
 
 const init_form = store.get_relevant_resultat(props_from_parent.endpoint_name, parameters);
 const init_form_params = init_form.parameters;
-console.log("init_form_params", init_form_params)
+// console.log("init_form_params", init_form_params)
 
 // TODO: make this type from Parameter value types
 let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number | number[] | File[]>]>> = ref([])
@@ -116,8 +113,8 @@ let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number | number[
 for (let i =0; i < props_from_parent.champs.length; i++) {
   let champ : Champ = props_from_parent.champs[i];
   let name : keyof ParameterMap  = champ.name as string;
-  console.log(champ);
-  console.log(init_form_params[name as keyof ParameterMap].value);
+  // console.log(champ);
+  // console.log(init_form_params[name as keyof ParameterMap].value);
   array_of_champs.value.push([champ, ref(init_form_params[name as keyof ParameterMap].value)]);
 }
 
@@ -125,8 +122,8 @@ for (let i =0; i < props_from_parent.champs.length; i++) {
 // Post
 const runtimeConfig = useRuntimeConfig();
 const bck_end_base_url_ = props_from_parent.backend == "" ? runtimeConfig.public.backend_url_public : props_from_parent.backend;
-console.log("bck_end_base_url_", bck_end_base_url_)
-console.log("bck_end_base_url_", props_from_parent.backend == "")
+// console.log("bck_end_base_url_", bck_end_base_url_)
+// console.log("bck_end_base_url_", props_from_parent.backend == "")
 const status_post = ref("");
 
 const res_from_post : Ref<string> = ref(init_form.result);    // TODO should accept other types of results
@@ -139,10 +136,10 @@ let filename : Ref<string> = ref("")
 let file_to_download_ = [""]
 
 function deal_with_response(res: any) {
-  console.log("res");
-  console.log(res);
-  console.log(res["df"]);
-  console.log(typeof(res));
+  // console.log("res");
+  // console.log(res);
+  // console.log(res["df"]);
+  // console.log(typeof(res));
   if ( res['fig'] !== undefined ) {
     console.log("yooo");
     bool_img.value = true;
@@ -162,8 +159,6 @@ function deal_with_response(res: any) {
     file_to_download.value = arrayyyy;
 
     filename.value = props_from_parent.name;
-    console.log(167)
-
   }
   else {
     console.log("jhsdssfskj")
@@ -202,6 +197,9 @@ async function post_form() {
     } else {
       body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][1].value
     }
+    if (array_of_champs.value[i][0].processing !== undefined) {
+      body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][0].processing(array_of_champs.value[i][1].value);
+    }
     body_params_only[array_of_champs.value[i][0].name] = {type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value}
   }
   body_json["dataframe"] = store.data_csv
@@ -215,7 +213,7 @@ async function post_form() {
       status_post.value = "pending";
     },
     onResponse({ request, response, options }) {
-      console.log("response._data", response._data);
+      // console.log("response._data", response._data);
       
       res_from_post.value = deal_with_response(response._data);    // TODO: this should also work when the endpoint does not return a fig
       

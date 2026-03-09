@@ -35,41 +35,41 @@
     <File_import> </File_import>
   </div>
   <div padding="100px" v-if="storeNav.show_stat_formulaire">
-    <Formulaire_stats_de_base v-bind:data="store.data_csv"></Formulaire_stats_de_base>
+    <FormulaireStatsDeBase v-bind:data="store.data_csv"></FormulaireStatsDeBase>
   </div>
 
   <div v-if="storeNav.show_swarmplot">
-    <FormulaireGeneralise name="Swarmplot" backend="" endpoint_name="/EDASwarmPlot" :champs=list_champ_swarmplot
-      store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Swarmplot" backend="" endpoint_name="/EDASwarmPlot" :champs=list_champ_swarmplot
+      store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_boxplot">
-    <FormulaireGeneralise name="Boxplot" backend="" endpoint_name="/EDABoxPlot" :champs=list_champ_boxplot
-      store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Boxplot" backend="" endpoint_name="/EDABoxPlot" :champs=list_champ_boxplot
+      store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_freq_cum">
-    <FormulaireGeneralise name="Fréquences cumulées" backend="" endpoint_name="/FreqCum" :champs=list_champ_freq_cum
-      store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Fréquences cumulées" backend="" endpoint_name="/FreqCum" :champs=list_champ_freq_cum
+      store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_hist">
-    <FormulaireGeneralise name="Histogramme" backend="" endpoint_name="/EDAHistogram" :champs=list_champ_histo
-      store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Histogramme" backend="" endpoint_name="/EDAHistogram" :champs=list_champ_histo
+      store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_modelling && mode == 'spectro' && mode == 'spectro'">
-    <FormulaireGeneralise name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto"
-      :champs=list_champ_modelling store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Modélisation" :backend=backeng_url_swag endpoint_name="/modelisation_auto"
+      :champs=list_champ_modelling store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_make_grid">
-    <FormulaireGeneralise name="Création de grille" :backend=backeng_url_swag endpoint_name="/grid_creation_pipeline"
-      :champs=list_champ_make_grid store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Création de grille" :backend=backeng_url_swag endpoint_name="/grid_creation_pipeline"
+      :champs=list_champ_make_grid store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_bm">
-    <FormulaireGeneralise name="Bilan massique" :backend=backeng_url_swag endpoint_name="/masse_volume_analysis_table"
-      :champs=list_champ_bm store_name="MyData_and_resultsStore"></FormulaireGeneralise>
+    <FormulaireStandard name="Bilan massique" :backend=backeng_url_swag endpoint_name="/masse_volume_analysis_table"
+      :champs=list_champ_bm store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_calc_vol">
-    <FormulaireGeneralise name="Calculs de volume" :backend=backeng_url_swag
+    <FormulaireStandard name="Calculs de volume" :backend=backeng_url_swag
       endpoint_name="/access_volume_analysis_table" :champs=list_champ_calc_vol store_name="MyData_and_resultsStore">
-    </FormulaireGeneralise>
+    </FormulaireStandard>
   </div>
 
 </template>
@@ -78,9 +78,8 @@
 
 import { useMyData_and_resultsStore } from '~/stores/data_and_results';
 import { useMyNavStore } from '~/stores/nav';
-import Formulaire_stats_de_base from '~/components/formulaire_stats_de_base.vue';
 import File_import from '~/components/file_import.vue';
-import type { Champ } from './formulaires/formulaire_generalise.vue';
+import type { Champ } from '~/components/formulaire/standard.vue';
 
 const mode = useRuntimeConfig().public.mode;
 const store = useMyData_and_resultsStore();
@@ -135,7 +134,7 @@ const list_champ_modelling: Ref<Array<Champ>> = ref([
 const list_champ_make_grid: Ref<Array<Champ>> = ref([
   // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Limites de site", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "MultiPolygon (((773763.58079883561003953 6906851.30234154034405947, 773886.10142979212105274 6906910.24099079333245754, 773889.07552961457986385 6906911.56206424534320831, 773940.10955770791042596 6906911.38668957818299532, 773988.3375911294715479 6906938.21901362668722868, 774043.39987717336043715 6906837.97427400853484869, 773984.579146922333166 6906809.0340728173032403, 773870.20331792603246868 6906745.24324842635542154, 773762.96557122189551592 6906846.07290682289749384, 773762.96557122189551592 6906846.07290682289749384, 773763.58079883561003953 6906851.30234154034405947)))" },
+  { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "zmin_zmax_constraints", type_of_params: "num_list", value: "0 1" },
   { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
   // {label: "Fichier avec surface (topographie par exemple), contient 3 colonnes X, Y, Z", name: "dataframe_topo",        type_of_params: "file",     value: []},

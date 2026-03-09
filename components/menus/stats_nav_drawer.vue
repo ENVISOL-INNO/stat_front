@@ -38,6 +38,9 @@
           <v-switch v-model="storeNav.show_modelling" color="primary" label="Modélisation"></v-switch>
         </v-list-item> -->
         <v-list-item>
+          <v-switch v-model="storeNav.show_make_grid" color="primary" label="Création de grille"></v-switch>
+        </v-list-item>
+        <v-list-item>
           <v-switch v-model="storeNav.show_bm" color="primary" label="Bilan massique"></v-switch>
         </v-list-item>
         <v-list-item>

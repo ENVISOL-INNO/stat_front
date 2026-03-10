@@ -2,13 +2,13 @@
   <h1>{{name}}</h1>
   <div v-for="i in array_of_champs.length">
     <div v-if="array_of_champs[i-1][0].type_of_params == 'col_list'">
-      <v-select v-model="array_of_champs[i-1][1].value" :items="store.colonnes" :label="champs[i-1].label" multiple></v-select>
+      <v-select v-model="array_of_champs[i-1][1].value" :items="store.colonnes" :label="champs[i-1].label" multiple clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i-1][0].type_of_params == 'num'">
       <v-text-field v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label" type="number"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i-1][0].type_of_params == 'col'">
-      <v-select v-model="array_of_champs[i-1][1].value" :items="store.colonnes" :label="champs[i-1].label"></v-select>
+      <v-select v-model="array_of_champs[i-1][1].value" :items="store.colonnes" :label="champs[i-1].label" clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i-1][0].type_of_params == 'num_list'">
       <v-text-field v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></v-text-field>
@@ -20,7 +20,7 @@
       <VFileInput v-model="array_of_champs[i-1][1].value" :label="champs[i-1].label"></VFileInput>
     </div>
     <div v-else-if="array_of_champs[i-1][0].type_of_params == 'txt_list'">
-      <v-select v-model="array_of_champs[i-1][1].value" :items="champs[i-1].options" :label="champs[i-1].label"></v-select>
+      <v-select v-model="array_of_champs[i-1][1].value" :items="champs[i-1].options" :label="champs[i-1].label" clearable></v-select>
     </div>
     <div v-else>
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -55,6 +55,7 @@
 <script lang="ts" setup>
 import { useMyData_and_resultsStore, useMySpectraStore, Resultat } from '~/stores/data_and_results';
 import type { ParameterMap, Parameter } from '~/stores/data_and_results';
+import { format_param } from '#imports';
 import * as PaPa from 'papaparse';
 
 export interface Champ extends Parameter {   // this looks a lot like a Parameter + a label, maybe change the type?
@@ -126,7 +127,7 @@ const bck_end_base_url_ = props_from_parent.backend == "" ? runtimeConfig.public
 // console.log("bck_end_base_url_", props_from_parent.backend == "")
 const status_post = ref("");
 
-const res_from_post : Ref<string> = ref(init_form.result);    // TODO should accept other types of results
+const res_from_post : Ref<string | string[]> = ref(init_form.result);    // TODO should accept other types of results
 
 
 let bool_img : Ref<boolean> = ref(false)
@@ -152,58 +153,31 @@ function deal_with_response(res: any) {
     file_to_download.value = arrayyyy;
 
     filename.value = "modelisation"
-
+    return arrayyyy
   }  else if (res['df'] !== undefined) {
     bool_file_to_download.value = true;
     const arrayyyy : Array<string> = res['df'];
     file_to_download.value = arrayyyy;
 
     filename.value = props_from_parent.name;
+    return arrayyyy
   }
   else {
     console.log("jhsdssfskj")
+    return ''
   }
 }
 
 
 async function post_form() {
-
   var body_json: {[id : string]: unknown} = {}
   var body_params_only : ParameterMap = {}
 
   for (let i = 0; i < props_from_parent.champs.length; i++) {
-    if(array_of_champs.value[i][0].type_of_params == "num") {
-      body_json[array_of_champs.value[i][0].name] = Number(array_of_champs.value[i][1].value)
-      // console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]))
-    } else if (array_of_champs.value[i][0].type_of_params == "num_list") {
-      // console.log("heeee", array_of_champs.value[i][1].value)
-      var full_string: String = String(array_of_champs.value[i][1].value); // This is a bit unnecessary, it simply unsures that full string is indeed a string
-      // console.log("heeee", full_string)
-      var list_str = full_string.split(' ');
-      // console.log("heeee", list_str)
-      body_json[array_of_champs.value[i][0].name] = list_str.map(s => Number(s))
-      // console.log("heeee", typeof(body_json[array_of_champs.value[i][0].name]), body_json[array_of_champs.value[i][0].name])
-    } else if (array_of_champs.value[i][0].type_of_params == "file") {
-      const csv_file = array_of_champs.value[i][1].value;
-      
-      let reader = new FileReader();
-
-      reader.readAsText(csv_file);
-      reader.onload = () => {
-        const csv_string: string = reader.result as string;
-        const new_data_csv = PaPa.parse(csv_string, { delimiter: ";", header: true, skipEmptyLines: true }).data;
-        body_json[array_of_champs.value[i][0].name] = new_data_csv
-      }
-    } else {
-      body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][1].value
-    }
-    if (array_of_champs.value[i][0].processing !== undefined) {
-      body_json[array_of_champs.value[i][0].name] = array_of_champs.value[i][0].processing(array_of_champs.value[i][1].value);
-    }
+    body_json[array_of_champs.value[i][0].name] = format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
     body_params_only[array_of_champs.value[i][0].name] = {type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value}
   }
   body_json["dataframe"] = store.data_csv
-
 
   const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
     method: 'POST',
@@ -213,8 +187,6 @@ async function post_form() {
       status_post.value = "pending";
     },
     onResponse({ request, response, options }) {
-      // console.log("response._data", response._data);
-      
       res_from_post.value = deal_with_response(response._data);    // TODO: this should also work when the endpoint does not return a fig
       
       const res = new Resultat(
@@ -229,7 +201,6 @@ async function post_form() {
     onRequestError({ request, response, options }) {
       // Handle the response errors
       console.log("onRequestError", request)
-
       status_post.value = "error"
     },
     onResponseError({ request, response, options }) {
@@ -250,8 +221,6 @@ function reset_everything() {
   bool_file_to_download.value = false
   bool_img.value = false
 }
-
-
 </script>
 
 <style>

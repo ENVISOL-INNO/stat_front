@@ -37,7 +37,6 @@
   <div padding="100px" v-if="storeNav.show_stat_formulaire">
     <FormulaireStatsDeBase v-bind:data="store.data_csv"></FormulaireStatsDeBase>
   </div>
-
   <div v-if="storeNav.show_swarmplot">
     <FormulaireStandard name="Swarmplot" backend="" endpoint_name="/EDASwarmPlot" :champs=list_champ_swarmplot
       store_name="MyData_and_resultsStore"></FormulaireStandard>
@@ -67,10 +66,13 @@
       :champs=list_champ_bm store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
   <div v-if="storeNav.show_calc_vol">
+    <FormulaireCalcVolume></FormulaireCalcVolume>
+  </div>
+  <!-- <div v-if="storeNav.show_calc_vol">
     <FormulaireStandard name="Calculs de volume" :backend=backeng_url_swag
       endpoint_name="/access_volume_analysis_table" :champs=list_champ_calc_vol store_name="MyData_and_resultsStore">
     </FormulaireStandard>
-  </div>
+  </div> -->
 
 </template>
 

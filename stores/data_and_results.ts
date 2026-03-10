@@ -24,10 +24,10 @@ export type ParameterMap = Record<string, Parameter>
 export class Resultat {
   endpoint_called: string;
   parameters: ParameterMap;
-  result: string;
+  result: string | string[];
   name_fig?: string;
 
-  constructor(endpoint_called: string, parameters: ParameterMap, result: string, name_fig: string) {
+  constructor(endpoint_called: string, parameters: ParameterMap, result: string | string[], name_fig: string) {
     this.endpoint_called = endpoint_called;
     this.parameters = parameters;
     this.result = result;

@@ -285,6 +285,21 @@
     });
   };
 
+
+  // clean up of params and results if new file is selected
+watch(() => store.data_csv, () => { reset_everything() });
+function reset_everything() {
+  for (let i = 0; i < list_champ_calc_vol.length; i++) {
+    array_of_champs.value[i][1].value = list_champ_calc_vol[i].value
+  };
+  array_of_champs_comp.value = [];
+  array_of_champs_rule.value = [];
+  res_from_post.value = ""
+  headers.value = []
+  json_table.value = []
+  bool_file_to_download.value = false
+}
+
 </script>
 
 <style>

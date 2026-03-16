@@ -69,7 +69,20 @@ export const useMyData_and_resultsStore = defineStore({
       const relevant_res = this.results.filter((value) => value.endpoint_called == endpoint_);
       console.log("relevant_res", relevant_res);
       if (relevant_res.length == 0) {
+        console.log("loosing my religion", this.results)
+        Object.entries(parameters).forEach(([strkey, param]) => {
+          console.log("i've said", strkey)
+          console.log("too much", param)
+          const sub_res = this.results.filter((value) => Object.entries(value.parameters).some(x => x[0] == strkey));
+          console.log("loosing my child", sub_res)
+          if (sub_res.length > 0) {
+            console.log("loosing my child", sub_res[sub_res.length - 1].parameters[strkey])
+            parameters[strkey] = sub_res[sub_res.length - 1].parameters[strkey]
+          }
+        });
+
         console.log("u here")
+        console.log("my downfall", parameters)
         return new Resultat(
           endpoint_,
           // parameters,

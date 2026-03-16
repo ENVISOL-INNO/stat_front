@@ -144,10 +144,14 @@ const list_champ_make_grid: Ref<Array<Champ>> = ref([
 ])
 
 function treat_polygon_to_data(polygon_wkt: string) {
-  const p: string = polygon_wkt.replace("MultiPolygon (((", "").replace(")))", "");
-  const array_points: string[] = p.split(", ");
-  const table: object[] = array_points.map((elt) => { return { "x": elt.split(" ")[0], "y": elt.split(" ")[1] } });
-  return table
+  if(polygon_wkt.length > 0) {
+    const p: string = polygon_wkt.replace("MultiPolygon (((", "").replace(")))", "");
+    const array_points: string[] = p.split(", ");
+    const table: object[] = array_points.map((elt) => { return { "x": elt.split(" ")[0], "y": elt.split(" ")[1] } });
+    return table
+  } else {
+    return []
+  }
 }
 
 const list_champ_bm: Ref<Array<Champ>> = ref([

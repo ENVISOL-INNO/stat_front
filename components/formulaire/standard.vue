@@ -28,10 +28,8 @@
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     </div>
   </div>
-  <v-btn color="primary" @click="post_form">Go</v-btn>
-  <!-- {{status_post}} -->
-  <div v-if="status_post == 'pending'">
-    <!-- brrrr -->
+  <div>
+    <v-btn color="primary" @click="post_form">Go</v-btn>
     <v-progress-circular v-if="status_post == 'pending'"
     color="green"
     indeterminate
@@ -49,7 +47,9 @@
     <NuxtImg v-bind:src="`data:image/jpg;base64,${res_from_post}`" />
     <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
   </div>
-
+  <div v-if="headers.length > 0 && status_post != 'pending'">
+    <v-data-table :headers="headers" :items="json_table"></v-data-table>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -134,7 +134,8 @@ let bool_img : Ref<boolean> = ref(false)
 let bool_file_to_download : Ref<boolean> = ref(false)
 let file_to_download : Ref<Array<string>> = ref([""])
 let filename : Ref<string> = ref("")
-let file_to_download_ = [""]
+let headers : Ref<{title: string, value: string}[]> = ref([]);
+let json_table = ref([]);
 
 function deal_with_response(res: any) {
   // console.log("res");
@@ -145,8 +146,7 @@ function deal_with_response(res: any) {
     console.log("yooo");
     bool_img.value = true;
     return res['fig']
-  }
-  else if (res['modelisation'] !== undefined) {
+  } else if (res['modelisation'] !== undefined) {
     bool_file_to_download.value = true;
     const string_array : string = res['modelisation']['kriging']['carto3D'];
     const arrayyyy : Array<string> = JSON.parse(string_array);
@@ -154,15 +154,19 @@ function deal_with_response(res: any) {
 
     filename.value = "modelisation"
     return arrayyyy
-  }  else if (res['df'] !== undefined) {
+  } else if (res['df'] !== undefined) {
     bool_file_to_download.value = true;
     const arrayyyy : Array<string> = res['df'];
     file_to_download.value = arrayyyy;
-
     filename.value = props_from_parent.name;
+    json_table.value = res["df"]
+    console.log("yes it's truuuue", res["cols_in_order"])
+    if (res["cols_in_order"] !== undefined) {
+      headers.value = res["cols_in_order"].map((c: string) => {return {"title" : c, "value": c}})
+      console.log("and i owe it all to you", headers.value)
+    }
     return arrayyyy
-  }
-  else {
+  } else {
     console.log("jhsdssfskj")
     return ''
   }

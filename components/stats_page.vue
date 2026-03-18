@@ -160,7 +160,7 @@ const list_champ_bm: Ref<Array<Champ>> = ref([
   { label: "Paramètre modélisé", name: "sim_str_identifier", type_of_params: "col", value: "" },
   { label: "Densité sol", name: "soil_density", type_of_params: "num", value: 1.8 },
   { label: "Concentrations séparées par un espace (ex. 0 200 1000) (si vide des valeurs automatiques seront déterminé)", name: "concentration_threshold_list_table", type_of_params: "num_list", value: "" },
-  { label: "Valeur de fond", name: "concentration_threshold_background", type_of_params: "num", value: 0.2 },
+  { label: "Valeur de fond", name: "concentration_threshold_background", type_of_params: "num", value: 0 },
 ])
 
 const list_champ_calc_vol: Ref<Array<Champ>> = ref([

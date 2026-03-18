@@ -46,6 +46,7 @@ export const useMyData_and_resultsStore = defineStore({
     return {               // le return est important !
       data_csv: [] as unknown[],
       colonnes: [] as string[],
+      colonnes_mixes: [] as string[],
       results: [] as Resultat[]
     }
   },
@@ -61,10 +62,22 @@ export const useMyData_and_resultsStore = defineStore({
       this.colonnes = new_colonnes
     },
 
+    set_colonnes_mixes(new_col_mix: string[]) {
+      this.colonnes_mixes = new_col_mix;
+    },
+
     add_result(result: Resultat) {
       this.results.push(result)
     },
 
+    get_data_in_one_col(col_name: string) {
+      return this.data_csv.map((v: any) => v[col_name])
+    },
+    
+    check_data_in_col_numeric(col_name: string) {
+      return this.data_csv.map((v: any) => v[col_name])
+    },
+    
     get_relevant_resultat(endpoint_: string, parameters : ParameterMap) : Resultat {
       const relevant_res = this.results.filter((value) => value.endpoint_called == endpoint_);
       if (relevant_res.length == 0) {

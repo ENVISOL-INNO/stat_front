@@ -24,10 +24,10 @@ export type ParameterMap = Record<string, Parameter>
 export class Resultat {
   endpoint_called: string;
   parameters: ParameterMap;
-  result: string;
+  result: string | string[];
   name_fig?: string;
 
-  constructor(endpoint_called: string, parameters: ParameterMap, result: string, name_fig: string) {
+  constructor(endpoint_called: string, parameters: ParameterMap, result: string | string[], name_fig: string) {
     this.endpoint_called = endpoint_called;
     this.parameters = parameters;
     this.result = result;
@@ -46,6 +46,7 @@ export const useMyData_and_resultsStore = defineStore({
     return {               // le return est important !
       data_csv: [] as unknown[],
       colonnes: [] as string[],
+      colonnes_mixes: [] as string[],
       results: [] as Resultat[]
     }
   },
@@ -61,15 +62,32 @@ export const useMyData_and_resultsStore = defineStore({
       this.colonnes = new_colonnes
     },
 
+    set_colonnes_mixes(new_col_mix: string[]) {
+      this.colonnes_mixes = new_col_mix;
+    },
+
     add_result(result: Resultat) {
       this.results.push(result)
     },
 
+    get_data_in_one_col(col_name: string) {
+      return this.data_csv.map((v: any) => v[col_name])
+    },
+    
+    check_data_in_col_numeric(col_name: string) {
+      return this.data_csv.map((v: any) => v[col_name])
+    },
+    
     get_relevant_resultat(endpoint_: string, parameters : ParameterMap) : Resultat {
       const relevant_res = this.results.filter((value) => value.endpoint_called == endpoint_);
-      console.log("relevant_res", relevant_res);
       if (relevant_res.length == 0) {
-        console.log("u here")
+        Object.entries(parameters).forEach(([strkey, param]) => {
+          const sub_res = this.results.filter((value) => Object.entries(value.parameters).some(x => x[0] == strkey));
+          if (sub_res.length > 0) {
+            parameters[strkey] = sub_res[sub_res.length - 1].parameters[strkey]
+          }
+        });
+
         return new Resultat(
           endpoint_,
           // parameters,

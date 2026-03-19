@@ -56,6 +56,7 @@ async function Read_File() {
       body: {"dataframe": store.data_csv},
       onResponse({ request, response, options }) {
         weird_colonnes.value = response._data["mixed_type_columns"];
+        store.set_colonnes_mixes(response._data["mixed_type_columns"].map((d : any) => d["col_name"]))
       },
       onResponseError({ request, response, options }) {
         // Handle the response errors

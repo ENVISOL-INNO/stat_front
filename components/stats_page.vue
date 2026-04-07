@@ -24,7 +24,7 @@
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         Le fichier attendu doit contenir :<br>
-        - les colonnes x, y, et z (il faut que ces noms soient respectés)<br>
+        - les colonnes x, y, z et drillhole (il faut que ces noms soient respectés)<br>
         - des colonnes avec les concentrations modélisées
       </v-expansion-panel-text>
     </v-expansion-panel>

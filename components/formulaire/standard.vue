@@ -177,15 +177,20 @@ async function post_form() {
   var body_params_only: ParameterMap = {}
 
   for (let i = 0; i < props_from_parent.champs.length; i++) {
-    body_json[array_of_champs.value[i][0].name] = format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
+    const c = await format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
+    body_json[array_of_champs.value[i][0].name] = c
+    console.log("ch", i)
     body_params_only[array_of_champs.value[i][0].name] = { type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value }
   }
+  console.log("choke me", body_json)
   body_json["dataframe"] = store.data_csv
-
+  
+  console.log("fgffffdf")
   const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
     method: 'POST',
     body: body_json,
     onRequest({ }) {
+      console.log("hey")
       file_to_download.value = ['']
       status_post.value = "pending";
     },
@@ -198,8 +203,8 @@ async function post_form() {
         response._data["fig"],
         response._data["name_fig"]
       );
-      store.add_result(res);
       status_post.value = "done"
+      store.add_result(res);
     },
     onRequestError({ request, response, options }) {
       // Handle the response errors

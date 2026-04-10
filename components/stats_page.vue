@@ -82,6 +82,7 @@ import { useMyData_and_resultsStore } from '~/stores/data_and_results';
 import { useMyNavStore } from '~/stores/nav';
 import File_import from '~/components/file_import.vue';
 import type { Champ } from '~/components/formulaire/standard.vue';
+import { format_param } from '#imports';
 
 const mode = useRuntimeConfig().public.mode;
 const store = useMyData_and_resultsStore();
@@ -136,23 +137,26 @@ const list_champ_modelling: Ref<Array<Champ>> = ref([
 const list_champ_make_grid: Ref<Array<Champ>> = ref([
   // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
+  { label: "Fichier limites de site, format geojson", name: "polygon_limits_df",        type_of_params: "file",     value: []},
+  // { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "zmin_zmax_constraints", type_of_params: "num_list", value: "0 1" },
-  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
+  { label: "Z est exprimé en               :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
   // {label: "Fichier avec surface (topographie par exemple), contient 3 colonnes X, Y, Z", name: "dataframe_topo",        type_of_params: "file",     value: []},
   // {label: "Si fichier : Comment découper par la surface ? Garder ce qui est :",          name: "which_to_keep",         type_of_params: "txt_list", value: "En dessous", options: ["Au dessus", "En dessous"]},
 ])
 
-function treat_polygon_to_data(polygon_wkt: string) {
-  if(polygon_wkt.length > 0) {
-    const p: string = polygon_wkt.replace("MultiPolygon (((", "").replace(")))", "");
-    const array_points: string[] = p.split(", ");
-    const table: object[] = array_points.map((elt) => { return { "x": elt.split(" ")[0], "y": elt.split(" ")[1] } });
-    return table
-  } else {
-    return []
-  }
-}
+// function treat_polygon_to_data(polygon_wkt: string) {
+//   if(polygon_wkt.length > 0) {
+//     const p: string = polygon_wkt.replace("MultiPolygon (((", "").replace(")))", "");
+//     const array_points: string[] = p.split(", ");
+//     const table: object[] = array_points.map((elt) => { 
+//       return { "x": elt.split(" ")[0], "y": elt.split(" ")[1] } });
+//     return table
+//   } else {
+//     return []
+//   }
+// }
+
 
 const list_champ_bm: Ref<Array<Champ>> = ref([
   // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},

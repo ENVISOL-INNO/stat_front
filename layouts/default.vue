@@ -19,7 +19,7 @@
     </v-app-bar>
 
     <v-main>
-          <v-alert v-if="!storeNav.mode_spectro"
+          <v-alert v-if="mode == 'prod'"
             border="bottom"
             colored-border
             color="blue-grey"

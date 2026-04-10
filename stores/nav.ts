@@ -17,6 +17,7 @@ export const useMyNavStore = defineStore({
       show_hist: false,
       show_make_grid: false,
       show_modelling: false,
+      show_rbf: false,
       show_bm: false,
       show_calc_vol: false,
     }

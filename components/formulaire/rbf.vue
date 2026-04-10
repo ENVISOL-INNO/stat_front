@@ -23,7 +23,7 @@
       <VFileInput v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></VFileInput>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'txt_list'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="Object.keys(champs[i - 1].options)" :label="champs[i - 1].label"
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="champs[i - 1].options" :label="champs[i - 1].label"
         clearable></v-select>
     </div>
     <div v-else>
@@ -61,7 +61,7 @@ import * as PaPa from 'papaparse';
 export interface Champ extends Parameter {
   label: string,
   name: keyof ParameterMap,
-  options?: Object,           // this should be a dict with both the option and its name in backend
+  options?: string[],
   processing?: Function
 }
 
@@ -88,21 +88,38 @@ let props_from_parent = defineProps({
   }
 });
 
+
+const name_form: string = "Modélisation : RBF"
+const endpoint_name: string = "/modelisation_rbf_auto"
+const backend: string = useRuntimeConfig().public.backend_swag_url_public
+
+const list_champ_rbf: Array<Champ> = [
+  { label: "Fichier limites de site, format geojson", name: "polygon",        type_of_params: "file",     value: []},
+  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "relative", options: ["relative", "above_sea_level"] },
+  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+  { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: "0 1" },
+  { label: "Paramètre modélisé", name: "model_parameter", type_of_params: "col", value: "" },
+  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
+  { label: "Taille d'anomalie attendue (large anomaly : anomalie de 30m ou plus)", name: "interp_mode", type_of_params: "txt_list", value: "small_anomaly", options: ["small_anomaly", "large_anomaly"] },
+]
+
+
+
 // Get store
 const store = useMyData_and_resultsStore();
-if (props_from_parent.store_name == "MySpectraStore") {
-  const store = useMySpectraStore();   // TODO select store from parent rather than its name
-}
+// if (store_name == "MySpectraStore") {
+//   const store = useMySpectraStore();   // TODO select store from parent rather than its name
+// }
 
 // Prep the parameters so we can get the relevant results from the store or init them
 const parameters: ParameterMap = {};
-for (let i = 0; i < props_from_parent.champs.length; i++) {
-  let champ: Champ = props_from_parent.champs[i];
+for (let i = 0; i < list_champ_rbf.length; i++) {
+  let champ: Champ = list_champ_rbf[i];
   let name: keyof ParameterMap = champ.name as string;
   parameters[name] = { "type_of_params": champ.type_of_params, "value": champ.value }
 }
 
-const init_form = store.get_relevant_resultat(props_from_parent.endpoint_name, parameters);
+const init_form = store.get_relevant_resultat(endpoint_name, parameters);
 const init_form_params = init_form.parameters;
 // console.log("init_form_params", init_form_params)
 
@@ -111,8 +128,8 @@ let array_of_champs: Ref<Array<[Champ, Ref<string | string[] | number | number[]
 
 
 // Prep the array of ref for the html template
-for (let i = 0; i < props_from_parent.champs.length; i++) {
-  let champ: Champ = props_from_parent.champs[i];
+for (let i = 0; i < list_champ_rbf.length; i++) {
+  let champ: Champ = list_champ_rbf[i];
   let name: keyof ParameterMap = champ.name as string;
   // console.log(champ);
   // console.log(init_form_params[name as keyof ParameterMap].value);
@@ -122,7 +139,7 @@ for (let i = 0; i < props_from_parent.champs.length; i++) {
 
 // Post
 const runtimeConfig = useRuntimeConfig();
-const bck_end_base_url_ = props_from_parent.backend == "" ? runtimeConfig.public.backend_url_public : props_from_parent.backend;
+const bck_end_base_url_ = backend == "" ? runtimeConfig.public.backend_url_public : backend;
 const status_post = ref("");
 const error_text = ref("")
 
@@ -157,7 +174,7 @@ function deal_with_response(res: any) {
     bool_file_to_download.value = true;
     const arrayyyy: Array<string> = res['df'];
     file_to_download.value = arrayyyy;
-    filename.value = props_from_parent.name;
+    filename.value = name_form;
     json_table.value = res["df"]
     console.log("yes it's truuuue", res["cols_in_order"])
     if (res["cols_in_order"] !== undefined) {
@@ -176,7 +193,7 @@ async function post_form() {
   var body_json: { [id: string]: unknown } = {}
   var body_params_only: ParameterMap = {}
 
-  for (let i = 0; i < props_from_parent.champs.length; i++) {
+  for (let i = 0; i < list_champ_rbf.length; i++) {
     const c = await format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
     body_json[array_of_champs.value[i][0].name] = c
     console.log("ch", i)
@@ -185,7 +202,7 @@ async function post_form() {
   console.log("choke me", body_json)
   body_json["dataframe"] = store.data_csv
   
-  const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
+  const { data: res, status } = await useFetch(bck_end_base_url_ + endpoint_name, {
     method: 'POST',
     body: body_json,
     onRequest({ }) {
@@ -197,7 +214,7 @@ async function post_form() {
       res_from_post.value = deal_with_response(response._data);    // TODO: this should also work when the endpoint does not return a fig
 
       const res = new Resultat(
-        props_from_parent.endpoint_name,
+        endpoint_name,
         body_params_only,
         response._data["fig"],
         response._data["name_fig"]
@@ -225,8 +242,8 @@ async function post_form() {
 // clean up of params and results if new file is selected
 watch(() => store.data_csv, () => { reset_everything() });
 function reset_everything() {
-  for (let i = 0; i < props_from_parent.champs.length; i++) {
-    array_of_champs.value[i][1].value = props_from_parent.champs[i].value
+  for (let i = 0; i < list_champ_rbf.length; i++) {
+    array_of_champs.value[i][1].value = list_champ_rbf[i].value
   };
   res_from_post.value = ""
   bool_file_to_download.value = false

@@ -61,6 +61,10 @@
     <FormulaireStandard name="Création de grille" :backend=backeng_url_swag endpoint_name="/grid_creation_pipeline"
       :champs=list_champ_make_grid store_name="MyData_and_resultsStore"></FormulaireStandard>
   </div>
+  <div v-if="storeNav.show_rbf">
+    <FormulaireStandard name="Modélisation : RBF" :backend=backeng_url_swag endpoint_name="/modelisation_rbf_auto"
+      :champs=list_champ_rbf store_name="MyData_and_resultsStore"></FormulaireStandard>
+  </div>
   <div v-if="storeNav.show_bm">
     <FormulaireStandard name="Bilan massique" :backend=backeng_url_swag endpoint_name="/masse_volume_analysis_table"
       :champs=list_champ_bm store_name="MyData_and_resultsStore"></FormulaireStandard>
@@ -82,6 +86,7 @@ import { useMyData_and_resultsStore } from '~/stores/data_and_results';
 import { useMyNavStore } from '~/stores/nav';
 import File_import from '~/components/file_import.vue';
 import type { Champ } from '~/components/formulaire/standard.vue';
+import { format_param } from '#imports';
 
 const mode = useRuntimeConfig().public.mode;
 const store = useMyData_and_resultsStore();
@@ -112,8 +117,9 @@ const list_champ_boxplot: Ref<Array<Champ>> = ref([
   { label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg" }
 ])
 
-// --- SWAG API ---
 
+
+// --- SWAG API ---
 
 const list_champ_modelling: Ref<Array<Champ>> = ref([
   // {label: "Polygone : x | y | z "            , name: "polygon"               , type_of_params: "string"  , value: ""},
@@ -136,26 +142,25 @@ const list_champ_modelling: Ref<Array<Champ>> = ref([
 const list_champ_make_grid: Ref<Array<Champ>> = ref([
   // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
+  { label: "Fichier limites de site, format geojson", name: "polygon_limits_df",        type_of_params: "file",     value: []},
+  // { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "zmin_zmax_constraints", type_of_params: "num_list", value: "0 1" },
-  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
+  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relativ", "m NGF": "mNGF"} },
   // {label: "Fichier avec surface (topographie par exemple), contient 3 colonnes X, Y, Z", name: "dataframe_topo",        type_of_params: "file",     value: []},
   // {label: "Si fichier : Comment découper par la surface ? Garder ce qui est :",          name: "which_to_keep",         type_of_params: "txt_list", value: "En dessous", options: ["Au dessus", "En dessous"]},
 ])
 
-function treat_polygon_to_data(polygon_wkt: string) {
-  if(polygon_wkt.length > 0) {
-    const p: string = polygon_wkt.replace("MultiPolygon (((", "").replace(")))", "");
-    const array_points: string[] = p.split(", ");
-    const table: object[] = array_points.map((elt) => { return { "x": elt.split(" ")[0], "y": elt.split(" ")[1] } });
-    return table
-  } else {
-    return []
-  }
-}
+const list_champ_rbf: Ref<Array<Champ>> = ref([
+  { label: "Fichier limites de site, format geojson", name: "polygon",        type_of_params: "file",     value: []},
+  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relative", "m NGF": "above_sea_level"} },
+  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+  { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: "0 1" },
+  { label: "Paramètre modélisé", name: "model_parameter", type_of_params: "col", value: "" },
+  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
+  { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
+])
 
 const list_champ_bm: Ref<Array<Champ>> = ref([
-  // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
   { label: "Paramètre modélisé", name: "sim_str_identifier", type_of_params: "col", value: "" },
   { label: "Densité sol", name: "soil_density", type_of_params: "num", value: 1.8 },
@@ -163,13 +168,13 @@ const list_champ_bm: Ref<Array<Champ>> = ref([
   { label: "Valeur de fond", name: "concentration_threshold_background", type_of_params: "num", value: 0 },
 ])
 
-const list_champ_calc_vol: Ref<Array<Champ>> = ref([
-  // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
-  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Paramètre modélisé", name: "pollutants_names", type_of_params: "col_list", value: [] },
-  { label: "Valeur min.", name: "pollutants_min_values", type_of_params: "num_list", value: "0" },
-  { label: "Valeur max.", name: "pollutants_max_values", type_of_params: "num_list", value: "999999999" },
-  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
-])
+// const list_champ_calc_vol: Ref<Array<Champ>> = ref([
+//   // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
+//   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+//   { label: "Paramètre modélisé", name: "pollutants_names", type_of_params: "col_list", value: [] },
+//   { label: "Valeur min.", name: "pollutants_min_values", type_of_params: "num_list", value: "0" },
+//   { label: "Valeur max.", name: "pollutants_max_values", type_of_params: "num_list", value: "999999999" },
+//   { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
+// ])
 
 </script>

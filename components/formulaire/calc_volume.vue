@@ -193,12 +193,13 @@
     headers.value = [{title: "Profondeurs en m :", value: "Profondeurs en m :"}]
     const array_of_refarray = [array_of_champs, array_of_champs_comp, array_of_champs_rule]
     
-    array_of_refarray.forEach(arr => {
-      arr.value.forEach(([value_champ, key_ref]) => {
-        pre_json[value_champ.name] = format_param(value_champ, key_ref.value)
-        body_params_only[value_champ.name] = {type_of_params: value_champ.type_of_params, value: key_ref.value}
-      });
-    });
+    for (let i = 0 ; i < array_of_refarray.length; i++) {
+      for (let j = 0 ; j < array_of_refarray[i].value.length; j++) {
+        const c = await format_param(array_of_refarray[i].value[j][0], array_of_refarray[i].value[j][1].value) ;
+        pre_json[array_of_refarray[i].value[j][0].name] = c
+        body_params_only[array_of_refarray[i].value[j][0].name] = {type_of_params: array_of_refarray[i].value[j][0].type_of_params, value: array_of_refarray[i].value[j][1].value}
+      }
+    }
 
     let strat: {[id : string]: any } = {
       "common" : {},
@@ -211,14 +212,16 @@
       strat["common"] = {};
       // strat["common"][site_col] = {"value_min": pre_json["site_val"], "value_max": pre_json["site_val"]}
     }
+    console.log("214 pre_json", pre_json)
     
-    const comp_list = pre_json["pollutants_names"] as string[];
+    const comp_list : string[] = pre_json["pollutants_names"] as string[];
     const tout_comp = comp_list.length > 1
     strat["specific"] = {};
     if(tout_comp) {
       strat["specific"]["Tout composés (seuils les plus élevés)"] = {}
     }
-
+    console.log("221 tout_comp", tout_comp, typeof(tout_comp));
+    console.log("221 comp_list", comp_list, typeof(comp_list));
     comp_list.forEach(comp => {
       const thresh_list = pre_json[`thresholds_${comp}`] as number[];
       if (pre_json[`rule_${comp}`] = "≥") {

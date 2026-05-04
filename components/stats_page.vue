@@ -113,8 +113,9 @@ const list_champ_boxplot: Ref<Array<Champ>> = ref([
   { label: "Unité", name: "unit", type_of_params: "string", value: "mg/kg" }
 ])
 
-// --- SWAG API ---
 
+
+// --- SWAG API ---
 
 const list_champ_modelling: Ref<Array<Champ>> = ref([
   // {label: "Polygone : x | y | z "            , name: "polygon"               , type_of_params: "string"  , value: ""},

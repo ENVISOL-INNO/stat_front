@@ -185,7 +185,6 @@ async function post_form() {
   console.log("choke me", body_json)
   body_json["dataframe"] = store.data_csv
   
-  console.log("fgffffdf")
   const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
     method: 'POST',
     body: body_json,

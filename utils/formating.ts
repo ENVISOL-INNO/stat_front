@@ -15,7 +15,9 @@ export async function format_param(champ: Champ, ref_value: any) {
     var list_str = full_string.split(' ');
     return list_str.map(s => Number(s))
   } else if (champ.type_of_params == "file") {
+    console.log("ref_value.name", ref_value.name);
     if (ref_value.name.endsWith(".csv")) {
+      console.log("cold = bad")
       const csv_file = ref_value;
       let reader = new FileReader();
       reader.readAsText(csv_file);
@@ -26,33 +28,6 @@ export async function format_param(champ: Champ, ref_value: any) {
       }
     } else if (ref_value.name.endsWith(".geojson")) {
       console.log("alcoholism = bad")
-      // const geojson_file = ref_value;
-      // console.log(geojson_file)
-      // const reader = new FileReader();
-      // console.log(32);
-      // // get the data as object
-      // const p = new Promise(() => {
-      //   reader.onloadend = () => {
-      //     const geojson_string = reader.result as string;
-      //     console.log(34)
-      //     console.log(geojson_string);
-      //     const new_data_json = JSON.parse(geojson_string);
-      //     console.log("38");
-      //     console.log(new_data_json["features"][0]["geometry"]["coordinates"][0]);
-      //     const array_points = new_data_json["features"][0]["geometry"]["coordinates"][0][0];
-      //     const table: object[] = array_points.map((elt: [number, number]) => { 
-      //       return { "x": elt[0], "y": elt[1] }
-      //     });
-      //     console.log(43);
-      //     console.log(table);
-      //   } ;
-      //   console.log(49);
-      //   reader.readAsText(geojson_file, 'utf-8');
-      // })
-      // p.then(() => {
-        
-      //   return reader.result;
-      // })
       const contents = await ref_value.text();
       console.log(49, contents);
       console.log(49, typeof(contents));

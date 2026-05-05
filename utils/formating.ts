@@ -16,7 +16,12 @@ export async function format_param(champ: Champ, ref_value: any) {
     return list_str.map(s => Number(s))
   } else if (champ.type_of_params == "file") {
     console.log("ref_value.name", ref_value.name);
-    if (ref_value.name.endsWith(".csv")) {
+    console.log("ref_value.name === undefined", ref_value.name === undefined);
+    if (ref_value.name === undefined) {
+      console.log("vctoir")
+      return []
+    }
+    else if (ref_value.name.endsWith(".csv")) {
       console.log("cold = bad")
       const csv_file = ref_value;
       let reader = new FileReader();

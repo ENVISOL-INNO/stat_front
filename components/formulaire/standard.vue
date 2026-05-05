@@ -215,9 +215,9 @@ async function post_form() {
       // Handle the response errors
       console.log("onResponseError");
       status_post.value = "error";
-      console.log(response);
+      console.log(response._data);
 
-      error_text.value = "Erreur, vérifier vos paramètres d'entrée, notemment que les colonnes choisies ne figure pas parmis les colonnes problématiques identifiées par le site."
+      error_text.value = "Erreur, vérifier vos paramètres d'entrée, notemment que les colonnes choisies ne figure pas parmis les colonnes problématiques identifiées par le site. (message du code : " + response._data
     }
   });
 };

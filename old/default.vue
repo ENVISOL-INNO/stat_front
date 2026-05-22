@@ -31,10 +31,7 @@
         Lors du calcul de signature géochimique par exemple, veillez notamment à n'inclure qu'une unique source de
         polluant dans vos données.
       </v-alert>
-      <div v-if="isLoading">
-        Loading...
-      </div>
-      <div v-if="isAuthenticated">
+      <div v-if="status == 'authenticated'">
         <NuxtPage />
       </div>
       <div v-else> <v-btn color="primary" block size="x-large" @click="lets_sign_in()">Connexion</v-btn> </div>
@@ -47,34 +44,33 @@
 const runtimeConfig = useRuntimeConfig()
 const mode = runtimeConfig.public.mode;
 
-import { useAuth0 } from '@auth0/auth0-vue'
-
 const {
-  isAuthenticated,
-  isLoading,
-  loginWithRedirect,
-  logout,
-  user
-} = useAuth0()
+  status,
+  data,
+  lastRefreshedAt,
+  getCsrfToken,
+  getProviders,
+  getSession,
+  signIn,
+  signOut
+} = useAuth()
 
 async function lets_sign_in() {
   console.log("trying to sign in");
-  await loginWithRedirect({
-    authorizationParams: {
-      prompt: "login"
-    }
-  })
+  await signIn("auth0", {}, { "prompt": "login" })
+  // see:
+  // https://github.com/sidebase/nuxt-auth/blob/main/src/runtime/composables/authjs/useAuth.ts
+  // l65  : signIn(provider, options, authorizationParams)
+  // authorizationParams let's you define how the app asks the user to login
+  // setting prompt to login makes it always ask the login/password rather than automatically reconnecting previous user
 }
 
 async function lets_sign_out() {
   console.log("trying to sign in");
-  logout({
-    logoutParams: {
-      returnTo: window.location.origin
-    }
-  })
+  await signOut()
 }
 
 import { useMyNavStore } from '#build/imports';
 const storeNav = useMyNavStore();
+
 </script>

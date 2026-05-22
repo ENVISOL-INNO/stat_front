@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "stats",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,12 +10,12 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@auth0/auth0-vue": "^2.7.0",
     "@internationalized/number": "^3.6.0",
     "@mdi/font": "^7.4.47",
     "@nuxt/image": "^1.8.1",
     "@pinia/nuxt": "^0.7.0",
     "dotenv": "^8.2.0",
-    "next-auth": "~4.21.1",
     "nuxt": "^3.17.7",
     "nuxt-plotly": "^1.0.14",
     "papaparse": "^5.4.1",
@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.12.3",
-    "@sidebase/nuxt-auth": "^0.9.4",
     "@types/papaparse": "^5.3.15",
     "vite-plugin-vuetify": "^2.0.3",
     "vuetify": "^3.6.5"

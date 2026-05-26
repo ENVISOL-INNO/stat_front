@@ -14,6 +14,10 @@ export async function format_param(champ: Champ, ref_value: any) {
     var full_string: String = String(ref_value); // This is a bit unnecessary, it simply unsures that full string is indeed a string
     var list_str = full_string.split(' ');
     return list_str.map(s => Number(s))
+  } else if (champ.type_of_params == "txt_list") {
+    const vv : string = String(ref_value)
+    var v: String = champ.options[vv];
+    return v
   } else if (champ.type_of_params == "file") {
     console.log("ref_value.name", ref_value.name);
     console.log("ref_value.name === undefined", ref_value.name === undefined);

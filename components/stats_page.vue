@@ -145,19 +145,19 @@ const list_champ_make_grid: Ref<Array<Champ>> = ref([
   { label: "Fichier limites de site, format geojson", name: "polygon_limits_df",        type_of_params: "file",     value: []},
   // { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "zmin_zmax_constraints", type_of_params: "num_list", value: "0 1" },
-  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
+  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relativ", "m NGF": "mNGF"} },
   // {label: "Fichier avec surface (topographie par exemple), contient 3 colonnes X, Y, Z", name: "dataframe_topo",        type_of_params: "file",     value: []},
   // {label: "Si fichier : Comment découper par la surface ? Garder ce qui est :",          name: "which_to_keep",         type_of_params: "txt_list", value: "En dessous", options: ["Au dessus", "En dessous"]},
 ])
 
 const list_champ_rbf: Ref<Array<Champ>> = ref([
   { label: "Fichier limites de site, format geojson", name: "polygon",        type_of_params: "file",     value: []},
-  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "relative", options: ["relative", "above_sea_level"] },
+  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relative", "m NGF": "above_sea_level"} },
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: "0 1" },
   { label: "Paramètre modélisé", name: "model_parameter", type_of_params: "col", value: "" },
   { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
-  { label: "Taille d'anomalie attendue", name: "interp_mode", type_of_params: "txt_list", value: "small_anomaly", options: ["small_anomaly", "large_anomaly"] },
+  { label: "Taille d'anomalie attendue (large anomaly : anomalie de 30m ou plus)", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
 ])
 
 const list_champ_bm: Ref<Array<Champ>> = ref([

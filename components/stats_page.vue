@@ -157,7 +157,7 @@ const list_champ_rbf: Ref<Array<Champ>> = ref([
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: "0 1" },
   { label: "Paramètre modélisé", name: "model_parameter", type_of_params: "col", value: "" },
   { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
-  { label: "Taille d'anomalie attendue (large anomaly : anomalie de 30m ou plus)", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
+  { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
 ])
 
 const list_champ_bm: Ref<Array<Champ>> = ref([

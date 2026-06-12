@@ -45,7 +45,7 @@ async function Read_File() {
   reader.readAsText(csv_file);
   reader.onload = async () => {
     const csv_string: string = reader.result as string;
-    const list_to_check = {"x": ["X"], "y": ["Y"], "z": ["Z", "prof", "Prof", "profondeur"], "drillholes": ["Drillhole", "Drillholes", "DRILLHOLE", "DRILLHOLES"]}
+    const list_to_check = {"x": ["X"], "y": ["Y"], "z": ["Z", "prof", "Prof", "profondeur"], "drillhole": ["Drillhole", "Drillholes", "DRILLHOLE", "DRILLHOLES"]}
     var new_da = csv_string;
     for (const [key, value] of Object.entries(list_to_check)) {
       for(const v of value) {

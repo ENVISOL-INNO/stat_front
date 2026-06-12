@@ -45,7 +45,15 @@ async function Read_File() {
   reader.readAsText(csv_file);
   reader.onload = async () => {
     const csv_string: string = reader.result as string;
-    const new_data_csv = PaPa.parse(csv_string, { delimiter: ";", header: true, skipEmptyLines: true }).data;
+    const list_to_check = {"x": ["X"], "y": ["Y"], "z": ["Z", "prof", "Prof", "profondeur"], "drillholes": ["Drillhole", "Drillholes", "DRILLHOLE", "DRILLHOLES"]}
+    var new_da = csv_string;
+    for (const [key, value] of Object.entries(list_to_check)) {
+      for(const v of value) {
+        new_da = new_da.replaceAll(v, key)
+      }
+    }
+    const new_data_csv = PaPa.parse(new_da, { delimiter: ";", header: true, skipEmptyLines: true }).data;
+    console.log("new_data_csv", new_data_csv);
     store.set_data_csv(new_data_csv);
     const parser = PaPa.parse(csv_string, { delimiter: ";" });
     const new_colonnes = parser.data[0] as [string];

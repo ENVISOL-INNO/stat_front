@@ -56,3 +56,19 @@ export async function format_param(champ: Champ, ref_value: any) {
       return ref_value;
   }
 }
+
+export function format_csv(parsed_csv_array: Array<object>) {
+  var x: boolean = false;
+  var y: boolean = false;
+  var z: boolean = false;
+  var d: boolean = false;
+  if ("X" in parsed_csv_array[0]) {
+    x = true;
+  } if ("Y" in parsed_csv_array[0]) {
+    x = true;
+  } if ("Z" in parsed_csv_array[0]) {
+    x = true;
+  } if ("Drillhole" in parsed_csv_array[0]) {
+    x = true;
+  }
+}

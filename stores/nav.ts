@@ -11,14 +11,14 @@ export const useMyNavStore = defineStore({
   state: () => {
     return {               // le return est important !
       mode_spectro: false,
-      show_stat_formulaire: false,
+      show_stat_formulaire: true,
       show_swarmplot: false,
       show_boxplot: false,
       show_freq_cum: false,
       show_hist: false,
       show_make_grid: false,
       show_modelling: false,
-      show_rbf: true,
+      show_rbf: false,
       show_bm: false,
       show_calc_vol: false,
     }

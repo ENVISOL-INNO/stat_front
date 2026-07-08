@@ -1,6 +1,6 @@
 <template>
   <MenusStatsNavDrawer />
-  <h1>Vous voulez :</h1>
+  <h1>Documentation</h1>
 
   <v-expansion-panels multiple>
     <v-expansion-panel>
@@ -150,15 +150,55 @@ const list_champ_make_grid: Ref<Array<Champ>> = ref([
   // {label: "Si fichier : Comment découper par la surface ? Garder ce qui est :",          name: "which_to_keep",         type_of_params: "txt_list", value: "En dessous", options: ["Au dessus", "En dessous"]},
 ])
 
+var x_col: Ref<string> = ref("")
+var y_col: Ref<string> = ref("")
+var z_col: Ref<string> = ref("")
+var d_col: Ref<string> = ref("")
+var z_min_max: Ref<string> = ref("")
+
 const list_champ_rbf: Ref<Array<Champ>> = ref([
-  { label: "Fichier limites de site, format geojson", name: "polygon",        type_of_params: "file",     value: []},
+  { label: "Paramètres du fichier", name:"", type_of_params:"label", value: "" },
+  { label: "Colonne contenant les coordonnées X", name: "x_col_name", type_of_params: "col", value: x_col },
+  { label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: y_col },
+  { label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: z_col },
   { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relative", "m NGF": "above_sea_level"} },
-  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: "0 1" },
-  { label: "Paramètre modélisé", name: "model_parameter", type_of_params: "col", value: "" },
-  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
-  { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
+  { label: "Composé ou paramètre à modéliser", name: "model_parameter", type_of_params: "col", value: "" },
+  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: d_col },
+  { label: "Paramètres de la grille de modélisation", name: "", type_of_params:"label", value: "" },
+  { label: "Taille des mailles de la grille en x en y en z séparées par un espace (par défaut 5mx5mx1m)", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+  { label: "Modifier l'épaisseur de la grille de modélisation : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: z_min_max },
+  { label: "Fichier limites de site, format geojson", name: "polygon", type_of_params: "file", value: []},
+  // { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
 ])
+
+function find_a_col_name_in_file(default_col_names: string[]) : string {
+  for (let i in default_col_names) {
+    const default_col_name = default_col_names[i]
+    if(store.colonnes.includes(default_col_name)) {
+      return default_col_name
+    } else if(store.colonnes.includes(default_col_name.toUpperCase())) {
+      return default_col_name.toUpperCase()
+    } else if(store.colonnes.includes(default_col_name.toWellFormed())) {
+      return default_col_name.toWellFormed()
+    } else if(store.colonnes.includes(default_col_name + "s")) {
+      return default_col_name + "s"
+    }
+  }
+  return ""
+}
+
+function get_z_min_max() {
+  console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", store.data_csv)
+  const z_str_list: string[] = store.data_csv.map((d) => d["z"])
+  console.log(187, z_str_list)
+  const z_number_list: number[] = z_str_list.map((d) => Number(d.replace(",", ".")))
+  console.log(188, z_number_list)
+  if(z_number_list.length != 0) {
+    console.log(Math.min(...z_number_list) + " " + Math.max(...z_number_list))
+    return Math.min(...z_number_list) + " " + Math.max(...z_number_list)
+  }
+  return "0 1"
+}
 
 const list_champ_bm: Ref<Array<Champ>> = ref([
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
@@ -176,5 +216,32 @@ const list_champ_bm: Ref<Array<Champ>> = ref([
 //   { label: "Valeur max.", name: "pollutants_max_values", type_of_params: "num_list", value: "999999999" },
 //   { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "relativ", options: ["relativ", "mNGF"] },
 // ])
+
+watch(() => store.data_csv, () => { update_list_champ_rbf() });
+function update_list_champ_rbf() {
+  console.log("wake me up")
+
+  x_col.value = find_a_col_name_in_file(["x"])
+  y_col.value = find_a_col_name_in_file(["y"])
+  z_col.value = find_a_col_name_in_file(["z"])
+  d_col.value = find_a_col_name_in_file(["drillhole", "échantillon", "sondage"])
+  z_min_max.value = get_z_min_max()
+
+  // list_champ_rbf.value = [
+  //   { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "relative", options: ["relative", "above_sea_level"] },
+  //   { label: "Paramètres du fichier", name:"", type_of_params:"label", value: "" },
+  //   { label: "Colonne contenant les coordonnées X", name: "x_col_name", type_of_params: "col", value: find_a_col_name_in_file(["x"]) },
+  //   { label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: find_a_col_name_in_file(["y"]) },
+  //   { label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: find_a_col_name_in_file(["z"]) },
+  //   { label: "Composé ou paramètre à modéliser", name: "model_parameter", type_of_params: "col", value: "" },
+  //   { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: find_a_col_name_in_file(["drillhole", "échantillon", "sondage"]) },
+  //   { label: "Paramètres de la grille de modélisation", name: "", type_of_params:"label", value: "" },
+  //   { label: "Taille des mailles de la grille en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+  //   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: get_z_min_max() },
+  //   { label: "Fichier limites de site, format geojson", name: "polygon", type_of_params: "file", value: []},
+  //   // { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
+  // ]
+  console.log("when september ends", list_champ_rbf)
+}
 
 </script>

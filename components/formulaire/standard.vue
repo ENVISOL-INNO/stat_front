@@ -1,20 +1,20 @@
 <template>
   <h1>{{ name }}</h1>
   <div v-for="i in array_of_champs.length">
-    <div v-if="array_of_champs[i - 1][0].type_of_params == 'col_list'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"
-        :rules="[rules.col_num]" multiple clearable></v-select>
+    <div v-if="array_of_champs[i - 1][0].type_of_params == 'label'">
+      <h2>{{champs[i - 1].label}}</h2>
+    </div>
+    <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'col_list'">
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label" :rules="[rules.col_num]" multiple clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'num'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label" type="number"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'col'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"
-        :rules="[rules.col_num]" clearable></v-select>
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label" :rules="[rules.col_num]" clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'num_list'">
-      <v-text-field v-model="array_of_champs[i - 1][1].value" :rules="[rules.num_list]"
-        :label="champs[i - 1].label"></v-text-field>
+      <v-text-field v-model="array_of_champs[i - 1][1].value" :rules="[rules.num_list]" :label="champs[i - 1].label"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'string'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></v-text-field>
@@ -23,8 +23,7 @@
       <VFileInput v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></VFileInput>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'txt_list'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="Object.keys(champs[i - 1].options)" :label="champs[i - 1].label"
-        clearable></v-select>
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="Object.keys(champs[i - 1].options)" :label="champs[i - 1].label" clearable></v-select>
     </div>
     <div v-else>
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -35,10 +34,10 @@
   <div>
     <v-btn color="primary" @click="post_form">Go</v-btn>
     <v-progress-circular v-if="status_post == 'pending'" color="green" indeterminate></v-progress-circular>
-  </div>
-  <div v-if="res_from_post != '' && status_post != 'pending' && bool_file_to_download">
-    <DownloadBlobBtn :data="file_to_download" :filename="filename" />
-    <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
+    <div v-if="res_from_post != '' && status_post != 'pending' && bool_file_to_download">
+      <DownloadBlobBtn :data="file_to_download" :filename="filename" />
+      <!-- <NuxtImg sizes="sm:600px md:760px lg:1200px xl:1200px" v-bind:src="`data:image/jpg;base64,${res_from_post}`" /> -->
+    </div>
   </div>
   <div v-if="status_post == 'error'">
     {{ error_text }}
@@ -178,9 +177,12 @@ async function post_form() {
 
   for (let i = 0; i < props_from_parent.champs.length; i++) {
     const c = await format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
-    body_json[array_of_champs.value[i][0].name] = c
-    console.log("ch", i)
+    console.log("ch", i, array_of_champs.value[i][0].name, array_of_champs.value[i][0].value, array_of_champs.value[i][1].value)
     body_params_only[array_of_champs.value[i][0].name] = { type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value }
+    if(array_of_champs.value[i][0].type_of_params != "label") {
+      console.log("ch", i, array_of_champs.value[i][0].name)
+      body_json[array_of_champs.value[i][0].name] = c
+    }
   }
   console.log("choke me", body_json)
   body_json["dataframe"] = store.data_csv

@@ -16,6 +16,8 @@ export async function format_param(champ: Champ, ref_value: any) {
     return list_str.map(s => Number(s))
   } else if (champ.type_of_params == "txt_list") {
     const vv : string = String(ref_value)
+    console.log(19, "je l'aime qd mm", champ.options)
+    console.log(19, "je l'aime qd mm", vv)
     var v: String = champ.options[vv];
     return v
   } else if (champ.type_of_params == "file") {
@@ -65,10 +67,11 @@ export function format_csv(parsed_csv_array: Array<object>) {
   if ("X" in parsed_csv_array[0]) {
     x = true;
   } if ("Y" in parsed_csv_array[0]) {
-    x = true;
+    y = true;
   } if ("Z" in parsed_csv_array[0]) {
-    x = true;
+    z = true;
   } if ("Drillhole" in parsed_csv_array[0]) {
-    x = true;
+    d = true;
   }
+  console.log("74 hellllllllllllll", x, y, z, d)
 }

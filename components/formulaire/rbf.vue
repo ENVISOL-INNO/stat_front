@@ -1,16 +1,24 @@
 <template>
-  <h1>{{ name }}</h1>
+  <div>
+    <h1>{{ name }}dsq</h1>
+  </div>
+  <div>
+    <h2>Paramètres des fichiers</h2>
+  </div>
+  fesfd
+  
+  <h2>Paramètres de la grille</h2>
   <div v-for="i in array_of_champs.length">
     <div v-if="array_of_champs[i - 1][0].type_of_params == 'col_list'">
       <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"
-        :rules="[rules.col_num]" multiple clearable></v-select>
+      :rules="[rules.col_num]" multiple clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'num'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label" type="number"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'col'">
       <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"
-        :rules="[rules.col_num]" clearable></v-select>
+      :rules="[rules.col_num]" clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'num_list'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :rules="[rules.num_list]"
@@ -94,12 +102,12 @@ const endpoint_name: string = "/modelisation_rbf_auto"
 const backend: string = useRuntimeConfig().public.backend_swag_url_public
 
 const list_champ_rbf: Array<Champ> = [
+  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
   { label: "Fichier limites de site, format geojson", name: "polygon",        type_of_params: "file",     value: []},
   { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "relative", options: ["relative", "above_sea_level"] },
-  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+  { label: "Taille des mailles de la grille en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
   { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: "0 1" },
   { label: "Paramètre modélisé", name: "model_parameter", type_of_params: "col", value: "" },
-  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: "" },
   { label: "Taille d'anomalie attendue (large anomaly : anomalie de 30m ou plus)", name: "interp_mode", type_of_params: "txt_list", value: "small_anomaly", options: ["small_anomaly", "large_anomaly"] },
 ]
 

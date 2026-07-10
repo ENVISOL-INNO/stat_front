@@ -45,7 +45,13 @@ export async function format_param(champ: Champ, ref_value: any) {
       const new_data_json = JSON.parse(contents);
       console.log("38");
       console.log(new_data_json["features"][0]["geometry"]["coordinates"][0]);
-      const array_points = new_data_json["features"][0]["geometry"]["coordinates"][0][0];
+      var array_points: [[number, number]] = [[-999, -999]]
+      if (new_data_json["features"][0]["geometry"]["type"] == "MultiPolygon") {
+        array_points = new_data_json["features"][0]["geometry"]["coordinates"][0][0];
+      }
+      else if (new_data_json["features"][0]["geometry"]["type"] == "Polygon") {
+        array_points = new_data_json["features"][0]["geometry"]["coordinates"][0];
+      }
       const table: object[] = array_points.map((elt: [number, number]) => { 
         return { "x": elt[0], "y": elt[1] }
       });

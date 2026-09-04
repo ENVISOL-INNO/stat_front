@@ -5,6 +5,7 @@ import type { Champ } from "~/components/formulaire/standard.vue";
 export async function format_param(champ: Champ, ref_value: any) {
   console.log("ggg");
   console.log(champ);
+  console.log(champ.label);
   if (champ.processing !== undefined) {
     return champ.processing(ref_value);
   }
@@ -60,7 +61,7 @@ export async function format_param(champ: Champ, ref_value: any) {
       return table
     }
   } else {
-      console.log("portugal = bad")
+      console.log("portugal = bad", ref_value)
       return ref_value;
   }
 }

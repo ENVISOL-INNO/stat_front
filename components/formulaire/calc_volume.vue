@@ -149,7 +149,7 @@
 
   const site = ref(init_form_params["site"].value)
   const site_val = ref(init_form_params["site_val"].value)
-  const mode_z = ref(init_form_params["mode_z"].value)
+  const mode_z = ref(init_form_params["mode_z"].value as string)
 
   // const loop = ref(init_form_params["loop"].value)
 
@@ -160,7 +160,7 @@
     // [{ label: "Seuils séparés par un espace (ex. 0 200 1000)", name: "thresholds", type_of_params: "num_list", value: "" },thresholds],
     [{ label: "Site ou zone", name: "site", type_of_params: "col", value: "" }, site],
     [{ label: "valeur à égaler (nombre)", name: "site_val", type_of_params: "num", value: "" }, site_val],
-    [{ label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "Profondeur relative", options: ['Profondeur relative', 'Altitude en mNGF'] }, mode_z]
+    [{ label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "Profondeur relative", options: {'Profondeur relative': "relativ", 'Altitude en mNGF': "NGF"} }, mode_z]
   ])
 
   let headers : Ref<{title: string, value: string}[]> = ref([]);
@@ -200,7 +200,8 @@
         body_params_only[array_of_refarray[i].value[j][0].name] = {type_of_params: array_of_refarray[i].value[j][0].type_of_params, value: array_of_refarray[i].value[j][1].value}
       }
     }
-
+    console.log(203, body_params_only)
+    console.log(204, pre_json)
     let strat: {[id : string]: any } = {
       "common" : {},
       "specific": {},

@@ -154,6 +154,10 @@
   // const loop = ref(init_form_params["loop"].value)
 
   let array_of_champs : Ref<Array<[Champ, Ref<string | string[] | number | number[] | File[]>]>> = ref([
+    [{ label: "Colonne contenant les coordonnées X", name: "x_col_name", type_of_params: "col", value: x_col }],
+    [{ label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: y_col }],
+    [{ label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: z_col }],
+
     [{ label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" }, grid_steps],
     [{ label: "Paramètres", name: "pollutants_names", type_of_params: "col_list", value: [] }, pollutants_names],
     // [{ label: "règle", name: "rule", type_of_params: "txt_list", value: [">", "≥", "=", "<", "≤"] }, rule],

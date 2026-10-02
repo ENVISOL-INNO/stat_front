@@ -139,48 +139,53 @@ const list_champ_modelling: Ref<Array<Champ>> = ref([
 //   {label: "Système de géoréférencement : code EPSG"                          , name: "inproj"                , type_of_params: "num"     , value: 2154},
 // ])
 
-const list_champ_make_grid: Ref<Array<Champ>> = ref([
-  // {label: "Fichier avec grille", name: "grid_df", type_of_params: "file", value: ""},
-  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Fichier limites de site, format geojson", name: "polygon_limits_df",        type_of_params: "file",     value: []},
-  // { label: "Limites de site, défini par un polygone depuis Qgis (format : 'MultiPolygon (((...)))')", name: "polygon_limits_df", type_of_params: "string", processing: treat_polygon_to_data, value: "" },
-  { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "zmin_zmax_constraints", type_of_params: "num_list", value: "0 1" },
-  { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relativ", "m NGF": "mNGF"} },
-  // {label: "Fichier avec surface (topographie par exemple), contient 3 colonnes X, Y, Z", name: "dataframe_topo",        type_of_params: "file",     value: []},
-  // {label: "Si fichier : Comment découper par la surface ? Garder ce qui est :",          name: "which_to_keep",         type_of_params: "txt_list", value: "En dessous", options: ["Au dessus", "En dessous"]},
-])
-
 var x_col: Ref<string> = ref("")
 var y_col: Ref<string> = ref("")
 var z_col: Ref<string> = ref("")
 var d_col: Ref<string> = ref("")
 var z_min_max: Ref<string> = ref("")
 
-const list_champ_rbf: Ref<Array<Champ>> = ref([
-  { label: "Paramètres du fichier", name:"", type_of_params:"label", value: "" },
+
+const list_champ_make_grid: Ref<Array<Champ>> = ref([
+  { label: "Paramètres du fichier", name: "", type_of_params: "label", value: "" },
   { label: "Colonne contenant les coordonnées X", name: "x_col_name", type_of_params: "col", value: x_col },
   { label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: y_col },
   { label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: z_col },
-  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: {"m relatif": "relative", "m NGF": "above_sea_level"} },
+  { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: d_col },
+  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: { "m relatif": "relative", "m NGF": "above_sea_level" } },
+  // { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "m relatif", options: { "m relatif": "relativ", "m NGF": "mNGF" } },
+  { label: "Paramètres de la grille", name: "", type_of_params: "label", value: "" },
+  { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
+  { label: "Fichier limites de site, format geojson", name: "polygon_limits_df", type_of_params: "file", value: [] },
+  { label: "Contraintes verticales : z min. et z max. séparés d'un espace", name: "zmin_zmax_constraints", type_of_params: "num_list", value: "0 1" },
+])
+
+
+const list_champ_rbf: Ref<Array<Champ>> = ref([
+  { label: "Paramètres du fichier", name: "", type_of_params: "label", value: "" },
+  { label: "Colonne contenant les coordonnées X", name: "x_col_name", type_of_params: "col", value: x_col },
+  { label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: y_col },
+  { label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: z_col },
+  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: { "m relatif": "relative", "m NGF": "above_sea_level" } },
   { label: "Composé ou paramètre à modéliser", name: "model_parameter", type_of_params: "col", value: "" },
   { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: d_col },
-  { label: "Paramètres de la grille de modélisation", name: "", type_of_params:"label", value: "" },
+  { label: "Paramètres de la grille de modélisation", name: "", type_of_params: "label", value: "" },
   { label: "Taille des mailles de la grille en x en y en z séparées par un espace (par défaut 5mx5mx1m)", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
   { label: "Modifier l'épaisseur de la grille de modélisation : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: z_min_max },
-  { label: "Fichier limites de site, format geojson", name: "polygon", type_of_params: "file", value: []},
+  { label: "Fichier limites de site, format geojson", name: "polygon", type_of_params: "file", value: [] },
   // { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
 ])
 
-function find_a_col_name_in_file(default_col_names: string[]) : string {
+function find_a_col_name_in_file(default_col_names: string[]): string {
   for (let i in default_col_names) {
     const default_col_name = default_col_names[i]
-    if(store.colonnes.includes(default_col_name)) {
+    if (store.colonnes.includes(default_col_name)) {
       return default_col_name
-    } else if(store.colonnes.includes(default_col_name.toUpperCase())) {
+    } else if (store.colonnes.includes(default_col_name.toUpperCase())) {
       return default_col_name.toUpperCase()
-    } else if(store.colonnes.includes(default_col_name.toWellFormed())) {
+    } else if (store.colonnes.includes(default_col_name.toWellFormed())) {
       return default_col_name.toWellFormed()
-    } else if(store.colonnes.includes(default_col_name + "s")) {
+    } else if (store.colonnes.includes(default_col_name + "s")) {
       return default_col_name + "s"
     }
   }
@@ -193,7 +198,7 @@ function get_z_min_max() {
   console.log(187, z_str_list)
   const z_number_list: number[] = z_str_list.map((d) => Number(d.replace(",", ".")))
   console.log(188, z_number_list)
-  if(z_number_list.length != 0) {
+  if (z_number_list.length != 0) {
     console.log(Math.min(...z_number_list) + " " + Math.max(...z_number_list))
     return Math.min(...z_number_list) + " " + Math.max(...z_number_list)
   }

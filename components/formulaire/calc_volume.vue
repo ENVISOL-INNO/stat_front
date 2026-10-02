@@ -209,9 +209,9 @@ async function post_form() {
   };
 
   if (pre_json["site"] != "" && pre_json["site"] !== null) {
-    const site_col = pre_json["site"];
-    strat["common"] = {};
-    // strat["common"][site_col] = {"value_min": pre_json["site_val"], "value_max": pre_json["site_val"]}
+    const site_col = pre_json["site"] as string;
+    // strat["common"] = {};
+    strat["common"][site_col] = { "value_min": pre_json["site_val"], "value_max": pre_json["site_val"] }
   }
   console.log("214 pre_json", pre_json)
 
@@ -252,6 +252,8 @@ async function post_form() {
     "grid_steps": pre_json["grid_steps"],
     "mode_z": pre_json["mode_z"]
   }
+
+  console.log(256, "toum toum toum toutoum", strat)
 
   Object.keys(strat["specific"]).forEach((col: string) => headers.value.push({ title: col, value: col }))
   console.log("headers.value", headers.value)

@@ -21,7 +21,8 @@
             Ici, "Tout composé" correspond au volume qui correspond à au moins un des critères suivants :
             <p v-for="i in pollutants_names.length">
               - {{ pollutants_names[i - 1] }} {{ array_of_champs_rule[i - 1][1] }}
-              {{ array_of_champs_comp[i - 1][1].value.split(' ')[array_of_champs_comp[i - 1][1].value.split(' ').length - 1] }}
+              {{ array_of_champs_comp[i - 1][1].value.split(' ')[array_of_champs_comp[i - 1][1].value.split(' ').length
+                - 1] }}
             </p>
           </v-card>
         </v-expansion-panel-text>
@@ -73,10 +74,6 @@ import { format_param } from '#imports';
 import { type Champ } from './standard.vue';
 
 const panel = ref([0])
-const translation = {
-  // '>': "above_value", '≥': "above_value", '=': "equal_to_value", '<': "below_value", '≤': "below_value",
-  "Profondeur relative": "relativ", "Altitude en mNGF": "ngf"
-}
 
 const runtimeConfig = useRuntimeConfig()
 const bck_end_base_url_ = runtimeConfig.public.backend_swag_url_public;
@@ -163,7 +160,7 @@ let array_of_champs: Ref<Array<[Champ, Ref<string | string[] | number | number[]
   // [{ label: "Seuils séparés par un espace (ex. 0 200 1000)", name: "thresholds", type_of_params: "num_list", value: "" },thresholds],
   [{ label: "Site ou zone", name: "site", type_of_params: "col", value: "" }, site],
   [{ label: "valeur à égaler (nombre)", name: "site_val", type_of_params: "num", value: "" }, site_val],
-  [{ label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "Profondeur relative", options: { 'Profondeur relative': "relativ", 'Altitude en mNGF': "NGF" } }, mode_z]
+  [{ label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "Profondeur relative", options: { 'Profondeur relative': "relative", 'Altitude en mNGF': "above_sea_level" } }, mode_z]
 ])
 
 let headers: Ref<{ title: string, value: string }[]> = ref([]);
@@ -253,7 +250,7 @@ async function post_form() {
     "dataframe": store.data_csv,
     "strat": strat,
     "grid_steps": pre_json["grid_steps"],
-    "mode_z": translation[pre_json["mode_z"]]
+    "mode_z": pre_json["mode_z"]
   }
 
   Object.keys(strat["specific"]).forEach((col: string) => headers.value.push({ title: col, value: col }))

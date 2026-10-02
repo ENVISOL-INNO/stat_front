@@ -171,7 +171,7 @@ const list_champ_rbf: Ref<Array<Champ>> = ref([
   { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: d_col },
   { label: "Paramètres de la grille de modélisation", name: "", type_of_params: "label", value: "" },
   { label: "Taille des mailles de la grille en x en y en z séparées par un espace (par défaut 5mx5mx1m)", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
-  { label: "Modifier l'épaisseur de la grille de modélisation : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: z_min_max },
+  { label: "Modifier l'épaisseur de la grille de modélisation : z min. et z max. séparés d'un espace", name: "grid_zmin_zmax", type_of_params: "num_list", value: z_min_max.value.length > 0 ? z_min_max : "0 1" },
   { label: "Fichier limites de site, format geojson", name: "polygon", type_of_params: "file", value: [] },
   // { label: "Taille d'anomalie attendue :", name: "interp_mode", type_of_params: "txt_list", value: "anomalie de moins de 30m", options: {"anomalie de moins de 30m": "small_anomaly", "anomalie de plus de 30m": "large_anomaly"} },
 ])

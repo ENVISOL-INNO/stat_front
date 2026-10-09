@@ -2,19 +2,22 @@
   <h1>{{ name }}</h1>
   <div v-for="i in array_of_champs.length">
     <div v-if="array_of_champs[i - 1][0].type_of_params == 'label'">
-      <h2>{{champs[i - 1].label}}</h2>
+      <h2>{{ champs[i - 1].label }}</h2>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'col_list'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label" :rules="[rules.col_num]" multiple clearable></v-select>
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"
+        :rules="[rules.col_num]" multiple clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'num'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label" type="number"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'col'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label" :rules="[rules.col_num]" clearable></v-select>
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="store.colonnes" :label="champs[i - 1].label"
+        :rules="[rules.col_num]" clearable></v-select>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'num_list'">
-      <v-text-field v-model="array_of_champs[i - 1][1].value" :rules="[rules.num_list]" :label="champs[i - 1].label"></v-text-field>
+      <v-text-field v-model="array_of_champs[i - 1][1].value" :rules="[rules.num_list]"
+        :label="champs[i - 1].label"></v-text-field>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'string'">
       <v-text-field v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></v-text-field>
@@ -23,7 +26,8 @@
       <VFileInput v-model="array_of_champs[i - 1][1].value" :label="champs[i - 1].label"></VFileInput>
     </div>
     <div v-else-if="array_of_champs[i - 1][0].type_of_params == 'txt_list'">
-      <v-select v-model="array_of_champs[i - 1][1].value" :items="Object.keys(champs[i - 1].options)" :label="champs[i - 1].label" clearable></v-select>
+      <v-select v-model="array_of_champs[i - 1][1].value" :items="Object.keys(champs[i - 1].options)"
+        :label="champs[i - 1].label" clearable></v-select>
     </div>
     <div v-else>
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -179,14 +183,14 @@ async function post_form() {
     const c = await format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
     console.log("ch", i, array_of_champs.value[i][0].name, array_of_champs.value[i][0].value, array_of_champs.value[i][1].value)
     body_params_only[array_of_champs.value[i][0].name] = { type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value }
-    if(array_of_champs.value[i][0].type_of_params != "label") {
+    if (array_of_champs.value[i][0].type_of_params != "label") {
       console.log("ch", i, array_of_champs.value[i][0].name)
       body_json[array_of_champs.value[i][0].name] = c
     }
   }
   console.log("choke me", body_json)
   body_json["dataframe"] = store.data_csv
-  
+
   const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
     method: 'POST',
     body: body_json,
@@ -236,10 +240,10 @@ function reset_everything() {
 }
 
 const rules = {
-  num : (v: string) => /^[+-]?(\d*\.)?\d*$/.test(v) || "Format attendu : nombres (avec . en séparateur décimal)",
-  int : (v: string) => /^[+-]?(\d)+$/.test(v) || "Format attendu : nombre entier",
+  num: (v: string) => /^[+-]?(\d*\.)?\d*$/.test(v) || "Format attendu : nombres (avec . en séparateur décimal)",
+  int: (v: string) => /^[+-]?(\d)+$/.test(v) || "Format attendu : nombre entier",
   num_list: (v: string) => /^((\d*\.)?\d*\s)*(\d*\.)?\d*$/.test(v) || "Format attendu : nombres (avec . en séparateur décimal) séparés d'un espace",
-  col_num : (v : string) => !store.colonnes_mixes.includes(v) || "Colonne ne contient pas que des nombres",
+  col_num: (v: string) => !store.colonnes_mixes.includes(v) || "Colonne ne contient pas que des nombres",
   falssse: (v: string) => false || "Format attendu : nombres séparés d'un espace"
 }
 </script>

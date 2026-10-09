@@ -152,7 +152,7 @@ const list_champ_make_grid: Ref<Array<Champ>> = ref([
   { label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: y_col },
   { label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: z_col },
   { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: d_col },
-  { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: { "m relatif": "relative", "m NGF": "above_sea_level" } },
+  // { label: "Z est exprimé en :", name: "depth_in", type_of_params: "txt_list", value: "m relatif", options: { "m relatif": "relative", "m NGF": "above_sea_level" } },
   // { label: "Z est exprimé en :", name: "mode_z", type_of_params: "txt_list", value: "m relatif", options: { "m relatif": "relativ", "m NGF": "mNGF" } },
   { label: "Paramètres de la grille", name: "", type_of_params: "label", value: "" },
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },

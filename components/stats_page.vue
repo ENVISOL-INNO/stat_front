@@ -196,16 +196,25 @@ function get_z_min_max() {
   console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh", store.data_csv)
   const z_str_list: string[] = store.data_csv.map((d) => d["z"])
   console.log(187, z_str_list)
-  const z_number_list: number[] = z_str_list.map((d) => Number(d.replace(",", ".")))
-  console.log(188, z_number_list)
-  if (z_number_list.length != 0) {
-    console.log(Math.min(...z_number_list) + " " + Math.max(...z_number_list))
-    return Math.min(...z_number_list) + " " + Math.max(...z_number_list)
+  try {
+    const z_number_list: number[] = z_str_list.map((d) => Number(d.replace(",", ".")))
+    console.log(188, z_number_list)
+    if (z_number_list.length != 0) {
+      console.log(Math.min(...z_number_list) + " " + Math.max(...z_number_list))
+      return Math.min(...z_number_list) + " " + Math.max(...z_number_list)
+    }
+  } catch {
+    return "0 1"
   }
   return "0 1"
 }
 
 const list_champ_bm: Ref<Array<Champ>> = ref([
+  // { label: "Paramètres du fichier", name: "", type_of_params: "label", value: "" },
+  // { label: "Colonne contenant les coordonnées X", name: "x_col_name", type_of_params: "col", value: x_col },
+  // { label: "Colonne contenant les coordonnées Y", name: "y_col_name", type_of_params: "col", value: y_col },
+  // { label: "Colonne contenant les coordonnées Z", name: "z_col_name", type_of_params: "col", value: z_col },
+  // { label: "Colonne avec les noms d'échantillon", name: "drillhole_col_name", type_of_params: "col", value: d_col },
   { label: "Taille de la cellule élémentaire en x en y en z séparées par un espace", name: "grid_steps", type_of_params: "num_list", value: "5 5 1" },
   { label: "Paramètre modélisé", name: "sim_str_identifier", type_of_params: "col", value: "" },
   { label: "Densité sol", name: "soil_density", type_of_params: "num", value: 1.8 },

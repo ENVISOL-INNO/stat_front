@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 // export type AllowedParameters =
 //   | 'swarmplot_nom_elem'
@@ -15,11 +15,19 @@ import { defineStore } from 'pinia'
 // based on this: https://medium.com/@perisicnikola37/dont-use-typescript-types-like-this-use-map-pattern-instead-bed75a0e986e
 // Here to add a type of parameter
 export type Parameter = {
-  type_of_params: "col" | "col_list" | "num" | "num_list" | "string" | "file" | "txt_list" | "label" ; // here: add text input
-  value: Array<string> | string | number | Array<number> | Array<File> ;
-}
+  type_of_params:
+    | "col"
+    | "col_list"
+    | "num"
+    | "num_list"
+    | "string"
+    | "file"
+    | "txt_list"
+    | "label"; // here: add text input
+  value: Array<string> | string | number | Array<number> | Array<File>;
+};
 
-export type ParameterMap = Record<string, Parameter>
+export type ParameterMap = Record<string, Parameter>;
 
 export class Resultat {
   endpoint_called: string;
@@ -27,28 +35,33 @@ export class Resultat {
   result: string | string[];
   name_fig?: string;
 
-  constructor(endpoint_called: string, parameters: ParameterMap, result: string | string[], name_fig: string) {
+  constructor(
+    endpoint_called: string,
+    parameters: ParameterMap,
+    result: string | string[],
+    name_fig: string,
+  ) {
     this.endpoint_called = endpoint_called;
     this.parameters = parameters;
     this.result = result;
     this.name_fig = name_fig;
-  };
+  }
 
   make_name_for_export() {
-    return this.endpoint_called + this.name_fig
-  };
+    return this.endpoint_called + this.name_fig;
+  }
 }
 
-
 export const useMyData_and_resultsStore = defineStore({
-  id: 'myData_and_resultsStore',
+  id: "myData_and_resultsStore",
   state: () => {
-    return {               // le return est important !
+    return {
+      // le return est important !
       data_csv: [] as unknown[],
       colonnes: [] as string[],
       colonnes_mixes: [] as string[],
-      results: [] as Resultat[]
-    }
+      results: [] as Resultat[],
+    };
   },
 
   actions: {
@@ -59,7 +72,7 @@ export const useMyData_and_resultsStore = defineStore({
     },
 
     set_colonnes(new_colonnes: string[]) {
-      this.colonnes = new_colonnes
+      this.colonnes = new_colonnes;
     },
 
     set_colonnes_mixes(new_col_mix: string[]) {
@@ -67,24 +80,31 @@ export const useMyData_and_resultsStore = defineStore({
     },
 
     add_result(result: Resultat) {
-      this.results.push(result)
+      this.results.push(result);
     },
 
     get_data_in_one_col(col_name: string) {
-      return this.data_csv.map((v: any) => v[col_name])
+      return this.data_csv.map((v: any) => v[col_name]);
     },
-    
+
     check_data_in_col_numeric(col_name: string) {
-      return this.data_csv.map((v: any) => v[col_name])
+      return this.data_csv.map((v: any) => v[col_name]);
     },
-    
-    get_relevant_resultat(endpoint_: string, parameters : ParameterMap) : Resultat {
-      const relevant_res = this.results.filter((value) => value.endpoint_called == endpoint_);
+
+    get_relevant_resultat(
+      endpoint_: string,
+      parameters: ParameterMap,
+    ): Resultat {
+      const relevant_res = this.results.filter(
+        (value) => value.endpoint_called == endpoint_,
+      );
       if (relevant_res.length == 0) {
         Object.entries(parameters).forEach(([strkey, param]) => {
-          const sub_res = this.results.filter((value) => Object.entries(value.parameters).some(x => x[0] == strkey));
+          const sub_res = this.results.filter((value) =>
+            Object.entries(value.parameters).some((x) => x[0] == strkey),
+          );
           if (sub_res.length > 0) {
-            parameters[strkey] = sub_res[sub_res.length - 1].parameters[strkey]
+            parameters[strkey] = sub_res[sub_res.length - 1].parameters[strkey];
           }
         });
 
@@ -93,25 +113,25 @@ export const useMyData_and_resultsStore = defineStore({
           // parameters,
           parameters,
           "",
-          ""
-        )
+          "",
+        );
+      } else {
+        return relevant_res[relevant_res.length - 1];
       }
-      else {
-        return relevant_res[relevant_res.length - 1]
-      };
-    }
-  }
-})
+    },
+  },
+});
 
 // Not very elegant...
 export const useMySpectraStore = defineStore({
-  id: 'mySpectraStore',
+  id: "mySpectraStore",
   state: () => {
-    return {               // le return est important !
+    return {
+      // le return est important !
       data_csv: [] as unknown[],
       colonnes: [] as string[],
-      results: [] as Resultat[]
-    }
+      results: [] as Resultat[],
+    };
   },
 
   actions: {
@@ -122,29 +142,33 @@ export const useMySpectraStore = defineStore({
     },
 
     set_colonnes(new_colonnes: string[]) {
-      this.colonnes = new_colonnes
+      this.colonnes = new_colonnes;
     },
 
     add_result(result: Resultat) {
-      this.results.push(result)
+      this.results.push(result);
     },
 
-    get_relevant_resultat(endpoint_: string, parameters : ParameterMap) : Resultat {
-      const relevant_res = this.results.filter((value) => value.endpoint_called == endpoint_);
+    get_relevant_resultat(
+      endpoint_: string,
+      parameters: ParameterMap,
+    ): Resultat {
+      const relevant_res = this.results.filter(
+        (value) => value.endpoint_called == endpoint_,
+      );
       console.log("relevant_res", relevant_res);
       if (relevant_res.length == 0) {
-        console.log("u here")
+        console.log("u here");
         return new Resultat(
           endpoint_,
           // parameters,
           parameters,
           "",
-          ""
-        )
+          "",
+        );
+      } else {
+        return relevant_res[relevant_res.length - 1];
       }
-      else {
-        return relevant_res[relevant_res.length - 1]
-      };
-    }
-  }
-})
+    },
+  },
+});

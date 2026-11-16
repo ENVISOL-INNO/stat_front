@@ -60,6 +60,7 @@ import { useMyData_and_resultsStore, useMySpectraStore, Resultat } from '~/store
 import type { ParameterMap, Parameter } from '~/stores/data_and_results';
 import { format_param } from '#imports';
 import * as PaPa from 'papaparse';
+import type { st } from 'vue-router/dist/router-CWoNjPRp.mjs';
 
 export interface Champ extends Parameter {
   label: string,
@@ -178,18 +179,43 @@ function deal_with_response(res: any) {
 async function post_form() {
   var body_json: { [id: string]: unknown } = {}
   var body_params_only: ParameterMap = {}
+  var spacial_col_names: Record<string, string> = {}
 
   for (let i = 0; i < props_from_parent.champs.length; i++) {
-    const c = await format_param(array_of_champs.value[i][0], array_of_champs.value[i][1].value)
-    console.log("ch", i, array_of_champs.value[i][0].name, array_of_champs.value[i][0].value, array_of_champs.value[i][1].value)
-    body_params_only[array_of_champs.value[i][0].name] = { type_of_params: array_of_champs.value[i][0].type_of_params, value: array_of_champs.value[i][1].value }
-    if (array_of_champs.value[i][0].type_of_params != "label") {
-      console.log("ch", i, array_of_champs.value[i][0].name)
-      body_json[array_of_champs.value[i][0].name] = c
+
+    var champ: Champ = array_of_champs.value[i][0];
+    var ref: Ref<string | string[] | number | number[] | File[]> = array_of_champs.value[i][1]
+
+    const c = await format_param(champ, ref.value)
+    console.log("ch", i, champ.name, champ.value, ref.value)
+
+    body_params_only[champ.name] = { type_of_params: champ.type_of_params, value: ref.value }
+
+    if (champ.type_of_params != "label") {
+      console.log("ch", i, champ.name)
+      body_json[champ.name] = c
+    }
+
+    if (["x_col_name", "y_col_name", "z_col_name", "drillhole_col_name"].includes(champ.name)) {
+      var n = champ.name
+      spacial_col_names[n] = ref.value.toString()
     }
   }
   console.log("choke me", body_json)
-  body_json["dataframe"] = store.data_csv
+
+  if (Object.hasOwn(spacial_col_names, "x_col_name")) {
+    body_json["dataframe"] = store.data_csv.map((item: Record<string, unknown>) => {
+      return {
+        ...item,
+        "x": item[spacial_col_names["x_col_name"]],
+        "y": item[spacial_col_names["y_col_name"]],
+        "z": item[spacial_col_names["z_col_name"]],
+        "drillhole": item[spacial_col_names["drillhole_col_name"]] ?? "",
+      }
+    })
+  } else {
+    body_json["dataframe"] = store.data_csv
+  }
 
   const { data: res, status } = await useFetch(bck_end_base_url_ + props_from_parent.endpoint_name, {
     method: 'POST',
